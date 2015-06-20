@@ -15,9 +15,6 @@ public class LogActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_log);
-
-        Intent i = new Intent(this, RegistrationActivity.class);
-        startActivity(i);
     }
 
     public void onPrijavaBtn(View view)
@@ -26,7 +23,11 @@ public class LogActivity extends Activity
         EditText ime = (EditText) findViewById(R.id.korIme);
         EditText loz = (EditText) findViewById(R.id.lozinka);
         if(ime.getText().toString().trim().equals("") || loz.getText().toString().trim().equals(""))
-            Toast.makeText(this, "Morate uneti i korisničko ime i lozinku!", Toast.LENGTH_LONG).show();
+        {
+            //Toast.makeText(this, "Morate uneti i korisničko ime i lozinku!", Toast.LENGTH_LONG).show();
+            Intent i = new Intent(this, MainActivity.class);
+            startActivity(i);
+        }
         else
         {
             // provera na sarveru
