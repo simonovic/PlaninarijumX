@@ -73,6 +73,13 @@
         android:layout_height="wrap_content"
         android:text="@string/slika"
         android:id="@+id/slikaBtn"
-        android:layout_marginTop="10dp" />
+        android:layout_marginTop="10dp"
+        android:onClick="onSlikaBtn"/>
+
+    <ImageView
+        android:id="@+id/viewImage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/elfak" />
 
 </LinearLayout>

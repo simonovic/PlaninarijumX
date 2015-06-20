@@ -6,4 +6,5 @@
         android:title="@string/action_mapa"
         android:orderInCategory="100"
         app:showAsAction="ifRoom" />
+
 </menu>

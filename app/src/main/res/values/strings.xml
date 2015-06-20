@@ -11,7 +11,7 @@
     <string name="kor_ime">Korisničko ime:</string>
     <string name="loz">Lozinka:</string>
     <string name="br_tel">Broj telefona:</string>
-    <string name="slika">Učitaj sliku</string>
+    <string name="slika">Dodaj sliku</string>
     <string name="title_activity_main">MainActivity</string>
 
     <string name="hello_world">Hello world!</string>

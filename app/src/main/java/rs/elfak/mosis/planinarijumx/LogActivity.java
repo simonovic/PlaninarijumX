@@ -20,8 +20,8 @@ public class LogActivity extends Activity
     public void onPrijavaBtn(View view)
     {
         Toast.makeText(this, "Radi!", Toast.LENGTH_LONG);
-        EditText ime = (EditText) findViewById(R.id.korIme);
-        EditText loz = (EditText) findViewById(R.id.lozinka);
+        EditText ime = (EditText)findViewById(R.id.korIme);
+        EditText loz = (EditText)findViewById(R.id.lozinka);
         if(ime.getText().toString().trim().equals("") || loz.getText().toString().trim().equals(""))
         {
             //Toast.makeText(this, "Morate uneti i korisničko ime i lozinku!", Toast.LENGTH_LONG).show();
