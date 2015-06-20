@@ -1,0 +1,66 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity"
+    android:background="@drawable/logo" >
+
+
+    <EditText
+        android:id="@+id/korIme"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="40dp"
+        android:layout_marginStart="40dp"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:textColor="#33b5e5"
+        android:hint="@string/kor_ime1"
+        android:layout_marginRight="40dp"
+        android:inputType="text" />
+
+    <EditText
+        android:id="@+id/lozinka"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/loz1"
+        android:layout_marginTop="15dp"
+        android:layout_below="@+id/korIme"
+        android:layout_alignLeft="@+id/korIme"
+        android:layout_alignStart="@+id/korIme"
+        android:textColor="#33b5e5"
+        android:layout_marginRight="40dp"
+        android:inputType="textPassword" />
+
+    <Button
+        android:id="@+id/prijavaBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/prijava"
+        android:layout_below="@+id/lozinka"
+        android:layout_alignLeft="@+id/lozinka"
+        android:layout_alignStart="@+id/lozinka"
+        android:layout_marginTop="20dp"
+        android:layout_alignRight="@+id/lozinka"
+        android:layout_alignEnd="@+id/lozinka"
+        android:onClick="onPrijavaBtn" />
+
+    <Button
+        android:id="@+id/regBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/reg"
+        android:layout_marginTop="15dp"
+        android:layout_below="@+id/prijavaBtn"
+        android:layout_alignLeft="@+id/prijavaBtn"
+        android:layout_alignStart="@+id/prijavaBtn"
+        android:layout_alignRight="@+id/prijavaBtn"
+        android:layout_alignEnd="@+id/prijavaBtn"
+        android:onClick="onRegBtn" />
+
+</RelativeLayout>

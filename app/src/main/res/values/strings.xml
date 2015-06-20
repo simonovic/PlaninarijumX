@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">PlaninarijumX</string>
+
+    <string name="title_activity_registration">Registracija</string>
+    <string name="kor_ime1">Korisničko ime</string>
+    <string name="loz1">Lozinka</string>
+    <string name="prijava">Prijava</string>
+    <string name="reg">Registracija</string>
+    <string name="ime">Ime:</string>
+    <string name="prezime">Prezime:</string>
+    <string name="kor_ime">Korisničko ime:</string>
+    <string name="loz">Lozinka:</string>
+    <string name="br_tel">Broj telefona:</string>
+    <string name="slika">Slika:</string>
+</resources>
