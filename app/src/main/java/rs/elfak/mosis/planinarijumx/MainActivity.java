@@ -1,6 +1,7 @@
 package rs.elfak.mosis.planinarijumx;
 
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,8 +30,8 @@ public class MainActivity extends Activity
                 startActivity(i);
             }
         });
-        handler = new Handler();
 
+        handler = new Handler();
         runnable = new Runnable() {
             @Override
             public void run() {
@@ -38,9 +39,7 @@ public class MainActivity extends Activity
                 handler.postDelayed(runnable, 3000);
             }
         };
-
         handler.postDelayed(runnable, 3000);
-
     }
 
     @Override
@@ -70,5 +69,11 @@ public class MainActivity extends Activity
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void onBluetBtn(View view)
+    {
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
     }
 }

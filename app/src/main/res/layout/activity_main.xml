@@ -16,4 +16,12 @@
         android:text="@string/action_mapa"
         />
 
+    <Button
+        android:layout_width="326dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/bluetoothBtn"
+        android:text="Bluetooth"
+        android:layout_marginTop="50dp"
+        android:onClick="onBluetBtn"/>
+
 </LinearLayout>
