@@ -2,16 +2,20 @@ package rs.elfak.mosis.planinarijumx;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 
 public class MainActivity extends Activity
 {
+
+    Handler handler;
+    Runnable runnable;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -25,6 +29,24 @@ public class MainActivity extends Activity
                 startActivity(i);
             }
         });
+        handler = new Handler();
+
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(),"Posalji serveru lokaciju", Toast.LENGTH_SHORT).show();
+                handler.postDelayed(runnable, 3000);
+            }
+        };
+
+        handler.postDelayed(runnable, 3000);
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        handler.removeCallbacks(runnable);
     }
 
     @Override

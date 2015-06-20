@@ -1,6 +1,9 @@
 package rs.elfak.mosis.planinarijumx;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.graphics.Color;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -17,7 +20,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.NumberPicker;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -59,6 +65,7 @@ public class MapActivity extends ActionBarActivity
                 (DrawerLayout) findViewById(R.id.drawer_layout));
 
         map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
+        map.setMyLocationEnabled(true);
     }
 
     @Override
@@ -77,6 +84,33 @@ public class MapActivity extends ActionBarActivity
                 break;
             case 2:
                 mTitle = getString(R.string.title_section2);
+                AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this, AlertDialog.THEME_TRADITIONAL);
+                builder.setMessage("Poruka").setTitle("Izaberi radius u metrima");
+                NumberPicker picker = new NumberPicker(MapActivity.this);
+
+               /* int broj = picker.getChildCount();
+                for(int i = 0; i < broj; i++)
+                {
+                    View v = picker.getChildAt(i);
+                    ((EditText)v).setTextColor(Color.WHITE);
+                }*/
+                picker.setMinValue(1);
+                picker.setMaxValue(10000);
+                builder.setView(picker);
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Toast.makeText(getApplicationContext(), "Idi do servera", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Toast.makeText(getApplicationContext(), "Odustao si", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
                 break;
             case 3:
                 mTitle = getString(R.string.title_section3);
