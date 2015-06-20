@@ -61,11 +61,18 @@
         android:inputType="textPassword"
         android:id="@+id/lozinka1" />
 
-    <TextView
-        android:text="@string/slika"
+    <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="17dp"
+        android:id="@+id/imageView"
+        android:layout_gravity="right" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/slika"
+        android:id="@+id/slikaBtn"
         android:layout_marginTop="10dp" />
 
 </LinearLayout>

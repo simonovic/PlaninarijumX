@@ -11,5 +11,5 @@
     <string name="kor_ime">Korisničko ime:</string>
     <string name="loz">Lozinka:</string>
     <string name="br_tel">Broj telefona:</string>
-    <string name="slika">Slika:</string>
+    <string name="slika">Učitaj sliku</string>
 </resources>

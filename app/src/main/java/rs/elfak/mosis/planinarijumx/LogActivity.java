@@ -12,7 +12,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 
-public class MainActivity extends Activity
+public class LogActivity extends Activity
 {
     @Override
     protected void onCreate(Bundle savedInstanceState)
