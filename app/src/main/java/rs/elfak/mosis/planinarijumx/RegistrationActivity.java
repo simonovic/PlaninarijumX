@@ -80,8 +80,8 @@ public class RegistrationActivity extends Activity
             if (requestCode == 1)
             {
                 Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
-                int nh = (int)(thumbnail.getHeight()*(2048.0/thumbnail.getWidth()));
-                Bitmap scaled = Bitmap.createScaledBitmap(thumbnail, 2048, nh, true);
+                int nh = (int)(thumbnail.getHeight()*(512.0/thumbnail.getWidth()));
+                Bitmap scaled = Bitmap.createScaledBitmap(thumbnail, 512, nh, true);
                 viewImage.setImageBitmap(scaled);
             }
             else if(requestCode == 2)
@@ -94,8 +94,8 @@ public class RegistrationActivity extends Activity
                 String picturePath = c.getString(columnIndex);
                 c.close();
                 Bitmap thumbnail = (BitmapFactory.decodeFile(picturePath));
-                int nh = (int)(thumbnail.getHeight()*(2048.0/thumbnail.getWidth()));
-                Bitmap scaled = Bitmap.createScaledBitmap(thumbnail, 2048, nh, true);
+                int nh = (int)(thumbnail.getHeight()*(512.0/thumbnail.getWidth()));
+                Bitmap scaled = Bitmap.createScaledBitmap(thumbnail, 512, nh, true);
                 viewImage.setImageBitmap(scaled);
             }
         }
