@@ -106,7 +106,7 @@ public class BluetoothActivity extends Activity
             });
             builder.setNegativeButton("Da", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    mBtAdapter.disable();
+                    //mBtAdapter.disable();
                     finish();
                 }
             });
@@ -169,7 +169,8 @@ public class BluetoothActivity extends Activity
     public void onDetectBtn(View view)
     {
         // ovde samo za probu
-        //ensureDiscoverable();
+        ensureDiscoverable();
+
         progress.setVisibility(View.VISIBLE);
         detectBtn.setClickable(false);
         detDevices.setVisibility(View.GONE);
