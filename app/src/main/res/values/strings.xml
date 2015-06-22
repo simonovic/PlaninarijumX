@@ -13,6 +13,8 @@
     <string name="br_tel">Broj telefona:</string>
     <string name="slika">Dodaj sliku</string>
     <string name="title_activity_main">MainActivity</string>
+    <string name="det_uredjaji">Detektuj uređaje</string>
+    <string name="title_activity_bluetooth">Bluetooth</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_mapa">Mapa</string>

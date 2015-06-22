@@ -36,10 +36,10 @@ public class MainActivity extends Activity
             @Override
             public void run() {
                 Toast.makeText(getApplicationContext(),"Posalji serveru lokaciju", Toast.LENGTH_SHORT).show();
-                handler.postDelayed(runnable, 3000);
+                handler.postDelayed(runnable, 13000);
             }
         };
-        handler.postDelayed(runnable, 3000);
+        handler.postDelayed(runnable, 13000);
     }
 
     @Override
@@ -74,6 +74,12 @@ public class MainActivity extends Activity
     public void onBluetBtn(View view)
     {
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-
+        if (bluetoothAdapter == null)
+            Toast.makeText(getApplicationContext(), "Uređaj ne podržava Bluetooth!", Toast.LENGTH_LONG).show();
+        else
+        {
+            Intent i = new Intent(this, BluetoothActivity.class);
+            startActivity(i);
+        }
     }
 }

@@ -19,12 +19,12 @@ public class LogActivity extends Activity
 
     public void onPrijavaBtn(View view)
     {
-        Toast.makeText(this, "Radi!", Toast.LENGTH_LONG);
+        Toast.makeText(getApplicationContext(), "Radi!", Toast.LENGTH_LONG);
         EditText ime = (EditText)findViewById(R.id.korIme);
         EditText loz = (EditText)findViewById(R.id.lozinka);
         if(ime.getText().toString().trim().equals("") || loz.getText().toString().trim().equals(""))
         {
-            //Toast.makeText(this, "Morate uneti i korisničko ime i lozinku!", Toast.LENGTH_LONG).show();
+            //Toast.makeText(getApplicationContext(), "Morate uneti i korisničko ime i lozinku!", Toast.LENGTH_LONG).show();
             Intent i = new Intent(this, MainActivity.class);
             startActivity(i);
         }
@@ -36,10 +36,10 @@ public class LogActivity extends Activity
             //////////////////////
 
             if(response == 0)
-                Toast.makeText(this, "Pogrešno korisničko ime i/ili lozinka!", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Pogrešno korisničko ime i/ili lozinka!", Toast.LENGTH_LONG).show();
             else
             {
-                Toast.makeText(this, "Pokreni activity!", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Pokreni activity!", Toast.LENGTH_LONG).show();
             }
         }
     }
