@@ -50,7 +50,8 @@ public class BluetoothActivity extends Activity
         filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         this.registerReceiver(mReceiver, filter);
         detectBtn = (Button)findViewById(R.id.detectBtn);
-        //progress.setVisibility(View.GONE);
+        progress = (ProgressBar)findViewById(R.id.progressBar);
+        progress.setVisibility(View.GONE);
         detDevices.setVisibility(View.GONE);
     }
 
@@ -98,14 +99,14 @@ public class BluetoothActivity extends Activity
         {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Isključiti Bluetooth!");
-            builder.setPositiveButton("Da", new DialogInterface.OnClickListener() {
+            builder.setPositiveButton("Ne", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    mBtAdapter.disable();
                     finish();
                 }
             });
-            builder.setNegativeButton("Ne", new DialogInterface.OnClickListener() {
+            builder.setNegativeButton("Da", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
+                    mBtAdapter.disable();
                     finish();
                 }
             });
@@ -131,10 +132,19 @@ public class BluetoothActivity extends Activity
         {
             switch (msg.what)
             {
+                case 1:
+                    switch (msg.arg1)
+                    {
+                        case 3:
+                            Toast.makeText(getApplicationContext(), "Uređaji su povezani!", Toast.LENGTH_LONG).show();
+                            break;
+                    }
+                    break;
                 case 2:
                     byte[] readBuf = (byte[]) msg.obj;
                     String readMessage = new String(readBuf, 0, msg.arg1);
                     Toast.makeText(getApplicationContext(), readMessage, Toast.LENGTH_LONG).show();
+                    //Intent i = new Intent(getApplicationContext(), MainActivity.class);
                     break;
             }
         }
@@ -143,7 +153,7 @@ public class BluetoothActivity extends Activity
     private void sendMessage(String message)
     {
         if (mService.getState() != mService.STATE_CONNECTED) {
-            Toast.makeText(getApplicationContext(), "Uređaji nisu povezani!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Uređaji nisu povezani!", Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -160,7 +170,7 @@ public class BluetoothActivity extends Activity
     {
         // ovde samo za probu
         //ensureDiscoverable();
-        //progress.setVisibility(View.VISIBLE);
+        progress.setVisibility(View.VISIBLE);
         detectBtn.setClickable(false);
         detDevices.setVisibility(View.GONE);
 
