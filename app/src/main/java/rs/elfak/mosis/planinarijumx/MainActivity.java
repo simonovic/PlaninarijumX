@@ -31,7 +31,7 @@ public class MainActivity extends Activity
             }
         });
 
-        handler = new Handler();
+        /*handler = new Handler();
         runnable = new Runnable() {
             @Override
             public void run() {
@@ -39,13 +39,13 @@ public class MainActivity extends Activity
                 handler.postDelayed(runnable, 13000);
             }
         };
-        handler.postDelayed(runnable, 13000);
+        handler.postDelayed(runnable, 13000);*/
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        handler.removeCallbacks(runnable);
+        //handler.removeCallbacks(runnable);
     }
 
     @Override
