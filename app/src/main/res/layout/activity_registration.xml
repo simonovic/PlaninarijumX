@@ -14,8 +14,7 @@
 
     <TextView android:text="@string/ime"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="17dp" />
+        android:layout_height="wrap_content" />
 
     <EditText
         android:layout_width="match_parent"
@@ -29,7 +28,6 @@
         android:text="@string/prezime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="17dp"
         android:layout_marginTop="10dp" />
 
     <EditText
@@ -42,7 +40,6 @@
         android:text="@string/kor_ime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="17dp"
         android:layout_marginTop="10dp" />
 
     <EditText
@@ -55,7 +52,6 @@
         android:text="@string/loz"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="17dp"
         android:layout_marginTop="10dp" />
 
     <EditText
@@ -63,6 +59,18 @@
         android:layout_height="wrap_content"
         android:inputType="textPassword"
         android:id="@+id/lozinka1" />
+
+    <TextView
+        android:text="@string/brtelefona"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:phoneNumber="true"
+        android:id="@+id/brtel" />
 
     <ImageView
         android:layout_width="wrap_content"

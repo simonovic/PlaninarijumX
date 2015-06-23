@@ -2,6 +2,7 @@ package rs.elfak.mosis.planinarijumx;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -18,7 +19,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.os.Handler;
@@ -32,7 +32,7 @@ public class BluetoothActivity extends Activity
     private ListView detDevices;
     private BluetoothService mService = null;
     private String deviceName;
-    ProgressBar progress;
+    ProgressDialog progressD;
     Button detectBtn;
     private static final int FRIEND_REQUEST = 10;
 
@@ -42,6 +42,8 @@ public class BluetoothActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bluetooth);
 
+        progressD = new ProgressDialog(this);
+        progressD.setCanceledOnTouchOutside(false);
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
         deviceName = mBtAdapter.getName()+ " ["+ mBtAdapter.getAddress() + "]";
         mNewDevicesArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
@@ -53,8 +55,6 @@ public class BluetoothActivity extends Activity
         filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         this.registerReceiver(mReceiver, filter);
         detectBtn = (Button)findViewById(R.id.detectBtn);
-        progress = (ProgressBar)findViewById(R.id.progressBar);
-        progress.setVisibility(View.GONE);
         detDevices.setVisibility(View.GONE);
     }
 
@@ -109,7 +109,7 @@ public class BluetoothActivity extends Activity
             });
             builder.setNegativeButton("Da", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    //mBtAdapter.disable();
+                    mBtAdapter.disable();
                     finish();
                 }
             });
@@ -234,9 +234,9 @@ public class BluetoothActivity extends Activity
 
         if(mBtAdapter.isEnabled())
         {
-            progress.setVisibility(View.VISIBLE);
-            detectBtn.setClickable(false);
-            detDevices.setVisibility(View.GONE);
+            progressD.setTitle("Bluetooth");
+            progressD.setMessage("Detektovanje u toku...");
+            progressD.show();
 
             if(mNewDevicesArrayAdapter.getCount() != 0) {
                 mNewDevicesArrayAdapter.clear();
@@ -273,9 +273,9 @@ public class BluetoothActivity extends Activity
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 mNewDevicesArrayAdapter.add(device.getName() + "\n" + device.getAddress());
             }
-            else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action))
-            {
-                progress.setVisibility(View.GONE);
+            else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+                progressD.dismiss();
+                //mBtAdapter.cancelDiscovery();
                 if (mNewDevicesArrayAdapter.getCount() == 0)
                     mNewDevicesArrayAdapter.add("Nijedan uređaj nije pronađen" + "\n" + "Pokušajte ponovo");
                 detDevices.setVisibility(View.VISIBLE);

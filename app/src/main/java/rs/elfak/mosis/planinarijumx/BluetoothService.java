@@ -43,6 +43,10 @@ public class BluetoothService
         mHandler = hand;
     }
 
+    public BluetoothAdapter getmAdapter() {
+        return mAdapter;
+    }
+
     private synchronized void setState(int sta)
     {
         mState = sta;
