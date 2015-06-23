@@ -70,6 +70,11 @@ public class LogActivity extends Activity
         Intent i = new Intent(this, RegistrationActivity.class);
         startActivity(i);
     }
+
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+    }
 }
 
 
