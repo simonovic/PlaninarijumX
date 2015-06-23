@@ -28,6 +28,11 @@ import android.widget.Toast;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.ArrayList;
 
 
 public class MapActivity extends ActionBarActivity
@@ -43,6 +48,7 @@ public class MapActivity extends ActionBarActivity
      */
     private CharSequence mTitle;
     private GoogleMap map;
+    private ArrayList<Place> quest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +83,8 @@ public class MapActivity extends ActionBarActivity
                 .commit();
     }
 
-    public void onSectionAttached(int number) {
+    public void onSectionAttached(final int number) {
+        invalidateOptionsMenu();
         switch (number) {
             case 1:
                 mTitle = getString(R.string.title_section1);
@@ -86,7 +93,7 @@ public class MapActivity extends ActionBarActivity
                 mTitle = getString(R.string.title_section2);
                 AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this, AlertDialog.THEME_TRADITIONAL);
                 builder.setMessage("Poruka").setTitle("Izaberi radius u metrima");
-                NumberPicker picker = new NumberPicker(MapActivity.this);
+                final NumberPicker picker = new NumberPicker(MapActivity.this);
 
                /* int broj = picker.getChildCount();
                 for(int i = 0; i < broj; i++)
@@ -100,7 +107,7 @@ public class MapActivity extends ActionBarActivity
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        Toast.makeText(getApplicationContext(), "Idi do servera", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Idi do servera" + picker.getValue() , Toast.LENGTH_SHORT).show();
                     }
                 });
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -114,6 +121,46 @@ public class MapActivity extends ActionBarActivity
                 break;
             case 3:
                 mTitle = getString(R.string.title_section3);
+                break;
+            case 4:
+                mTitle = getString(R.string.title_section4);
+                quest = new ArrayList<Place>();
+                map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+                    @Override
+                    public void onMapLongClick(final LatLng latLng) {
+                        if(mNavigationDrawerFragment.getmCurrentSelectedPosition() == 3)
+                        {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this);
+                            LayoutInflater inflater = MapActivity.this.getLayoutInflater();
+                            final View view = inflater.inflate(R.layout.place_layout,null);
+                            builder.setView(view)
+                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            EditText editText = (EditText) view.findViewById(R.id.add_question);
+                                            String q = editText.getText().toString();
+
+                                            editText = (EditText) view.findViewById(R.id.add_answer);
+                                            String a = editText.getText().toString();
+
+
+                                            Place place = new Place(latLng.latitude,latLng.longitude,a,q);
+                                            quest.add(place);
+                                            map.addMarker(new MarkerOptions().position(latLng).title(q));
+                                        }
+                                    })
+                                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            Toast.makeText(getApplicationContext(), "Odustao si", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                            AlertDialog alertDialog = builder.create();
+                            alertDialog.show();
+
+                        }
+                    }
+                });
                 break;
         }
     }
@@ -132,7 +179,11 @@ public class MapActivity extends ActionBarActivity
             // Only show items in the action bar relevant to this screen
             // if the drawer is not showing. Otherwise, let the drawer
             // decide what to show in the action bar.
-            getMenuInflater().inflate(R.menu.map, menu);
+            if(mNavigationDrawerFragment.getmCurrentSelectedPosition() == 3)
+            {
+                getMenuInflater().inflate(R.menu.add_quest,menu);
+            }else
+                getMenuInflater().inflate(R.menu.map, menu);
             restoreActionBar();
             return true;
         }
@@ -149,6 +200,16 @@ public class MapActivity extends ActionBarActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        }
+        else if(id == R.id.action_done_adding_places)
+        {
+            Toast.makeText(this,"Posalji serveru",Toast.LENGTH_SHORT).show();
+            quest.clear();
+            quest = null;
+            map.clear();
+            mNavigationDrawerFragment.selectItem(0);
+            Place.ID = 0;
+
         }
 
         return super.onOptionsItemSelected(item);
