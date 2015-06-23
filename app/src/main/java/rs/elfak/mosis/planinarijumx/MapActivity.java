@@ -86,12 +86,12 @@ public class MapActivity extends ActionBarActivity
             fakeQuest.clear();
         }
         fakeQuest = new ArrayList<Place>();
-        double lat = Simon.latitude;
-        double lng = Simon.longitude;
+        double lat = MainActivity.myLocation.latitude;
+        double lng = MainActivity.myLocation.longitude;
 
         Random r = new Random();
         int broj = r.nextInt(10);
-        for (int i = 0; i < broj; i++)
+        for (int i = 0; i < 2; i++)
         {
             double faktor = r.nextDouble();
             faktor = faktor - 0.5;
@@ -131,7 +131,7 @@ public class MapActivity extends ActionBarActivity
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         Toast.makeText(getApplicationContext(), "Idi do servera" + picker.getValue() , Toast.LENGTH_SHORT).show();
-                        CircleOptions circleOptions = new CircleOptions().center(Simon).
+                        CircleOptions circleOptions = new CircleOptions().center(MainActivity.myLocation).
                                 radius(picker.getValue()).fillColor(0x4033B5E5).strokeColor(0x00000000);//51 181 229
                         map.addCircle(circleOptions);
                     }

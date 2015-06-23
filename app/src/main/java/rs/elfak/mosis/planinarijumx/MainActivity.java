@@ -8,11 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
-
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 
 
@@ -21,7 +17,7 @@ public class MainActivity extends Activity
 
     Handler handler;
     Runnable runnable;
-    LatLng myLocation = new LatLng(43.319425, 21.899487);
+    public static LatLng myLocation = new LatLng(43.319425, 21.899487);
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
