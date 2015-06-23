@@ -27,7 +27,7 @@ public class MainActivity extends Activity
     public static final String passpref = "pass";
     Handler handler;
     Runnable runnable;
-    LatLng myLocation = new LatLng(43.319425, 21.899487);
+    static LatLng myLocation = new LatLng(43.319425, 21.899487);
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -39,7 +39,6 @@ public class MainActivity extends Activity
 
         //Bundle extras = getIntent().getExtras();
         //username = extras.getString("user");
-        //password = extras.getString("pass");
 
         /*handler = new Handler();
         runnable = new Runnable() {
