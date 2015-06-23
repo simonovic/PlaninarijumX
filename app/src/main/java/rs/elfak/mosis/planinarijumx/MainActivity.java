@@ -22,14 +22,6 @@ public class MainActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Button mapaBut = (Button) findViewById(R.id.start_map);
-        mapaBut.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(MainActivity.this,MapActivity.class);
-                startActivity(i);
-            }
-        });
 
         /*handler = new Handler();
         runnable = new Runnable() {
@@ -50,36 +42,35 @@ public class MainActivity extends Activity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_mapa)
+        switch (item.getItemId())
         {
-            return true;
+            case R.id.mapa:
+                Intent i = new Intent(MainActivity.this,MapActivity.class);
+                startActivity(i);
+                break;
+            case R.id.bluetooth:
+                BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+                if (bluetoothAdapter == null)
+                    Toast.makeText(getApplicationContext(), "Uređaj ne podržava Bluetooth!", Toast.LENGTH_LONG).show();
+                else
+                {
+                    Intent in = new Intent(this, BluetoothActivity.class);
+                    startActivity(in);
+                }
+                break;
+            case R.id.profil:
+                break;
+            case R.id.logout:
+                break;
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public void onBluetBtn(View view)
-    {
-        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (bluetoothAdapter == null)
-            Toast.makeText(getApplicationContext(), "Uređaj ne podržava Bluetooth!", Toast.LENGTH_LONG).show();
-        else
-        {
-            Intent i = new Intent(this, BluetoothActivity.class);
-            startActivity(i);
-        }
     }
 }

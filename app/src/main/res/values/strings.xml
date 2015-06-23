@@ -12,10 +12,12 @@
     <string name="loz">Lozinka:</string>
     <string name="br_tel">Broj telefona:</string>
     <string name="slika">Dodaj sliku</string>
-    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_main">PlaninarijumX</string>
     <string name="det_uredjaji">Pronađi uređaje</string>
-    <string name="title_activity_bluetooth">Bluetooth</string>
+    <string name="title_activity_bluetooth">Dodaj prijatelja</string>
     <string name="brtelefona">Broj telefona:</string>
+    <string name="logout">Odjava</string>
+    <string name="profil">Profil</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_mapa">Mapa</string>
