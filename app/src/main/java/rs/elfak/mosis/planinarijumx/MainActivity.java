@@ -3,6 +3,7 @@ package rs.elfak.mosis.planinarijumx;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
@@ -11,12 +12,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
+
 
 public class MainActivity extends Activity
 {
 
     Handler handler;
     Runnable runnable;
+    public LatLng myLocation = new LatLng(43.319425, 21.899487);
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -32,6 +37,19 @@ public class MainActivity extends Activity
             }
         };
         handler.postDelayed(runnable, 13000);*/
+    }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
+            @Override
+            public void onMyLocationChange(Location location) {
+                myLocation = new LatLng(location.getLatitude(),location.getLongitude());
+                Toast.makeText(getApplicationContext(),"Update sam lokaciju", Toast.LENGTH_SHORT).show();
+            }
+        };
     }
 
     @Override
