@@ -31,10 +31,10 @@ public class BluetoothActivity extends Activity
     private ArrayAdapter<String> mNewDevicesArrayAdapter = null;
     private ListView detDevices;
     private BluetoothService mService = null;
-    private boolean onOff;
     private String deviceName;
     ProgressBar progress;
     Button detectBtn;
+    private static final int FRIEND_REQUEST = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -63,12 +63,10 @@ public class BluetoothActivity extends Activity
     {
         super.onStart();
         if (!mBtAdapter.isEnabled()) {
-            onOff = false;
             Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(intent, 1);
         } else {
             Toast.makeText(getApplicationContext(), "Bluetooth je uključen!", Toast.LENGTH_LONG).show();
-            onOff = true;
             if(mService == null)
                 mService = new BluetoothService(this, mHandler);
         }
@@ -125,13 +123,27 @@ public class BluetoothActivity extends Activity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1)
-            if (resultCode == -1) {
+        if (requestCode == 1) {
+            if (resultCode == -1)
                 mService = new BluetoothService(this, mHandler);
-                onOff = true;
+        }
+        else if (requestCode == FRIEND_REQUEST)
+        {
+            if (resultCode == RESULT_OK)
+            {
+                Toast.makeText(getApplicationContext(), "Prihvatio, salji serveru i upisi u lokalnu bazu!", Toast.LENGTH_LONG).show();
+                String message = "responseYes " + deviceName;
+                byte[] send = message.getBytes();
+                mService.write(send);
             }
-            else
-                onOff = false;
+            else if (resultCode == RESULT_CANCELED)
+            {
+                String message = "responseNo " + deviceName;
+                byte[] send = message.getBytes();
+                mService.write(send);
+            }
+        }
+
     }
 
     private final Handler mHandler = new Handler()
@@ -152,42 +164,49 @@ public class BluetoothActivity extends Activity
                 case 2:
                     byte[] readBuf = (byte[]) msg.obj;
                     String readMessage = new String(readBuf, 0, msg.arg1);
-                    if(readMessage.equals("request"))
+                    String[] tmp = readMessage.split(" ");
+                    if(tmp[0].equals("request"))
                     {
-                        //ide alert
-                        Toast.makeText(getApplicationContext(), deviceName, Toast.LENGTH_LONG).show();
-
-                        /*AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
-                        builder.setTitle(deviceName + " želi da postanete prijatelji");
-                        builder.setPositiveButton("Odbij", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                String tmp = "responseNo";
-                                mService.write(tmp.getBytes());
-                            }
-                        });
-                        builder.setNegativeButton("Prihvati", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                String tmp = "responseYes";
-                                mService.write(tmp.getBytes());
-                            }
-                        });
-                        AlertDialog dialog = builder.create();
-                        dialog.show();*/
-                        /*Intent i = new Intent(getApplicationContext(), FriendRequestActivity.class);
-                        i.putExtra("device", deviceName);
-                        startActivity(i);*/
+                        Intent i = new Intent(getApplicationContext(), FriendRequestActivity.class);
+                        i.putExtra("device", readMessage.substring(8));
+                        startActivityForResult(i, FRIEND_REQUEST);
                     }
-                    else if (readMessage.equals("responseYes"))
+                    else if (tmp[0].equals("responseYes"))
                     {
                         //salji serveru i upisi u lokalnu bazu
-                        Toast.makeText(getApplicationContext(), "responseYes", Toast.LENGTH_LONG).show();
+                        RespondeYes(readMessage.substring(12));
                     }
-                    else
-                        Toast.makeText(getApplicationContext(), "Zahtev za prijateljstvom odbijen!", Toast.LENGTH_LONG).show();
+                    else if (tmp[0].equals("responseNo")) {
+                        RespondeNo(readMessage.substring(11));
+                    }
                     break;
             }
         }
     };
+
+    public void RespondeNo(String message)
+    {
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
+        builder1.setTitle(message + " je odbio zahtev za prijateljstvom!");
+        builder1.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+            }
+        });
+        AlertDialog dialog = builder1.create();
+        dialog.show();
+    }
+
+    public void RespondeYes(String message)
+    {
+        AlertDialog.Builder builder2 = new AlertDialog.Builder(this);
+        builder2.setTitle(message + " je prihvatio zahtev za prijateljstvom!");
+        builder2.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+            }
+        });
+        AlertDialog dialog = builder2.create();
+        dialog.show();
+    }
 
     private void sendMessage(String message)
     {
@@ -202,7 +221,10 @@ public class BluetoothActivity extends Activity
 
     public void onSendRequestBtn(View view)
     {
-        sendMessage("request");
+        sendMessage("request " + deviceName);
+        /*Intent i = new Intent(getApplicationContext(), FriendRequestActivity.class);
+        i.putExtra("device", deviceName);
+        startActivityForResult(i, FRIEND_REQUEST);*/
     }
 
     public void onDetectBtn(View view)
@@ -210,7 +232,7 @@ public class BluetoothActivity extends Activity
         // ovde samo za probu
         ensureDiscoverable();
 
-        if(onOff)
+        if(mBtAdapter.isEnabled())
         {
             progress.setVisibility(View.VISIBLE);
             detectBtn.setClickable(false);

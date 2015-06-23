@@ -11,8 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/textView"
-        android:text="blabla"
-        android:textSize="17dp" />
+        android:text="blabla" />
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -22,13 +21,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Prihvati"
-        android:id="@+id/prihvatiBtn"/>
+        android:id="@+id/prihvatiBtn"
+        android:onClick="onPrihvatiBtn"
+        android:layout_marginTop="30dp" />
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Odbij"
-        android:id="@+id/odbijBtn" />
-
+        android:id="@+id/odbijBtn"
+        android:onClick="onOdbijBtn"/>
 
 </LinearLayout>

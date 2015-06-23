@@ -1,12 +1,15 @@
 package rs.elfak.mosis.planinarijumx;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 public class FriendRequestActivity extends Activity
@@ -19,6 +22,8 @@ public class FriendRequestActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend_request);
 
+        setFinishOnTouchOutside(false);
+
         Bundle extras = getIntent().getExtras();
         device = extras.getString("device");
         TextView text = (TextView)findViewById(R.id.textView);
@@ -26,24 +31,23 @@ public class FriendRequestActivity extends Activity
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_friend_request, menu);
-        return true;
+    public void onBackPressed() {
+        Intent returnIntent = new Intent();
+        setResult(RESULT_CANCELED,returnIntent);
+        finish();
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+    public void onPrihvatiBtn(View view)
+    {
+        Intent returnIntent = new Intent();
+        setResult(RESULT_OK,returnIntent);
+        finish();
+    }
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
+    public void onOdbijBtn(View view)
+    {
+        Intent returnIntent = new Intent();
+        setResult(RESULT_CANCELED,returnIntent);
+        finish();
     }
 }
