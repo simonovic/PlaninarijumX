@@ -95,6 +95,8 @@ public class MainActivity extends Activity
                 }
                 break;
             case R.id.profil:
+                Intent inn = new Intent(this, MyProfileActivity.class);
+                startActivity(inn);
                 break;
             case R.id.logout:
                 SharedPreferences.Editor editor = shPref.edit();

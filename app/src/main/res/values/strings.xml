@@ -18,6 +18,8 @@
     <string name="brtelefona">Broj telefona:</string>
     <string name="logout">Odjava</string>
     <string name="profil">Profil</string>
+    <string name="poeni">Poeni:</string>
+    <string name="rang">Rang:</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_mapa">Mapa</string>
@@ -41,4 +43,5 @@
     <string name="question">Pitanje</string>
     <string name="answer">Odgovor</string>
     <string name="start_solving">Počni kviz</string>
+    <string name="title_activity_my_profile">Moj profil</string>
 </resources>
