@@ -113,16 +113,12 @@ public class RegistrationActivity extends Activity
 
         final String sendBuff = "0\n" + novaOsoba.toString()+"\n";
 
-
-
-
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-
-                    InetAddress adr=InetAddress.getByName(MainActivity.address);
-                    Socket socket = new Socket(adr,MainActivity.PORT);
+                    InetAddress adr = InetAddress.getByName(MainActivity.address);
+                    Socket socket = new Socket(adr, MainActivity.PORT);
                     PrintWriter printWriter = new PrintWriter(socket.getOutputStream(),true);
                     printWriter.write(sendBuff);
                     printWriter.flush();

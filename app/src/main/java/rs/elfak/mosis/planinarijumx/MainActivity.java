@@ -7,11 +7,27 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.util.ArrayList;
 
 //0 - Registracija
 public class MainActivity extends Activity
@@ -22,7 +38,8 @@ public class MainActivity extends Activity
     public static final String userpref = "user";
     public static final String passpref = "pass";
     public static final String address = "192.168.1.10";
-    public static final int PORT = 4444;
+    public static final int PORT = 4443;
+    private static final String request = "5\nplanine\n";
     Handler handler;
     Runnable runnable;
     static LatLng myLocation = new LatLng(43.319425, 21.899487);
@@ -47,6 +64,35 @@ public class MainActivity extends Activity
             }
         };
         handler.postDelayed(runnable, 13000);*/;
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+
+                    InetAddress adr = InetAddress.getByName(MainActivity.address);
+                    Socket socket = new Socket(adr, MainActivity.PORT);
+                    PrintWriter printWriter = new PrintWriter(socket.getOutputStream(),true);
+                    printWriter.write(request);
+                    printWriter.flush();
+
+                    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    String pl = in.readLine();
+                    Gson gson = new GsonBuilder().serializeNulls().create();
+                    ArrayList<Planina> planine = gson.fromJson(pl, new TypeToken<ArrayList<Planina>>(){}.getType());
+
+                    //Toast.makeText(getApplicationContext(), planine.get(0).toString(), Toast.LENGTH_LONG).show();
+                    String pom = planine.get(0).toString();
+                    Log.v("PlaninarijumX", planine.get(0).toString() + "\n");
+
+                    printWriter.close();
+                    socket.close();
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     protected void onStart() {
