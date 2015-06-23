@@ -43,11 +43,12 @@ public class MainActivity extends Activity
     @Override
     protected void onStart() {
         super.onStart();
-        GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
+        final GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
             @Override
             public void onMyLocationChange(Location location) {
                 myLocation = new LatLng(location.getLatitude(),location.getLongitude());
-                Toast.makeText(getApplicationContext(),"Update sam lokaciju", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),"Update sam lokaciju" + myLocation.latitude
+                        + "  " + myLocation.longitude, Toast.LENGTH_SHORT).show();
             }
         };
     }
