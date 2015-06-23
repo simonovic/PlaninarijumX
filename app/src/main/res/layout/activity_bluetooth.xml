@@ -26,21 +26,15 @@
         android:onClick="onSendRequestBtn"
         android:layout_gravity="right" />
 
-    <ProgressBar
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/progressBar"
-        android:layout_gravity="center_horizontal" />
-
     <ListView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/listView"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:paddingTop="5dp"
-        android:paddingBottom="5dp" />
+        android:paddingBottom="5dp"
+        android:clickable="true" />
 
 </LinearLayout>

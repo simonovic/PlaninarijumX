@@ -43,6 +43,10 @@ public class BluetoothService
         mHandler = hand;
     }
 
+    public BluetoothAdapter getmAdapter() {
+        return mAdapter;
+    }
+
     private synchronized void setState(int sta)
     {
         mState = sta;
@@ -257,7 +261,7 @@ public class BluetoothService
         }
 
         public void cancel() {
-            Log.d(TAG, "Socket Type" + mSocketType + "cancel " + this);
+            Log.d(TAG, "Socket Type " + mSocketType + "cancel " + this);
             try {
                 mmServerSocket.close();
             } catch (IOException e) {
