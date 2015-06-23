@@ -2,8 +2,11 @@ package rs.elfak.mosis.planinarijumx;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
@@ -41,14 +44,33 @@ public class MainActivity extends Activity
 
     protected void onStart() {
         super.onStart();
-        final GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
+        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        LocationListener listener = new LocationListener() {
             @Override
-            public void onMyLocationChange(Location location) {
+            public void onLocationChanged(Location location) {
                 myLocation = new LatLng(location.getLatitude(),location.getLongitude());
-                Toast.makeText(getApplicationContext(),"Update sam lokaciju" + myLocation.latitude
-                        + "  " + myLocation.longitude, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),"Posalji serveru lokaciju", Toast.LENGTH_SHORT).show();
+
+            }
+
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String s) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String s) {
+
             }
         };
+
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,2000,0,listener);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,2000,0,listener);
     }
 
     @Override
