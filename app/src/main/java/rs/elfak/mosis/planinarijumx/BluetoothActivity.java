@@ -31,6 +31,8 @@ public class BluetoothActivity extends Activity
     private ArrayAdapter<String> mNewDevicesArrayAdapter = null;
     private ListView detDevices;
     private BluetoothService mService = null;
+    private boolean onOff;
+    private String deviceName;
     ProgressBar progress;
     Button detectBtn;
 
@@ -41,6 +43,7 @@ public class BluetoothActivity extends Activity
         setContentView(R.layout.activity_bluetooth);
 
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
+        deviceName = mBtAdapter.getName()+ " ["+ mBtAdapter.getAddress() + "]";
         mNewDevicesArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
         detDevices = (ListView)findViewById(R.id.listView);
         detDevices.setAdapter(mNewDevicesArrayAdapter);
@@ -60,10 +63,12 @@ public class BluetoothActivity extends Activity
     {
         super.onStart();
         if (!mBtAdapter.isEnabled()) {
+            onOff = false;
             Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(intent, 1);
         } else {
             Toast.makeText(getApplicationContext(), "Bluetooth je uključen!", Toast.LENGTH_LONG).show();
+            onOff = true;
             if(mService == null)
                 mService = new BluetoothService(this, mHandler);
         }
@@ -118,11 +123,15 @@ public class BluetoothActivity extends Activity
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1)
-            mService = new BluetoothService(this, mHandler);
+            if (resultCode == -1) {
+                mService = new BluetoothService(this, mHandler);
+                onOff = true;
+            }
+            else
+                onOff = false;
     }
 
     private final Handler mHandler = new Handler()
@@ -143,8 +152,38 @@ public class BluetoothActivity extends Activity
                 case 2:
                     byte[] readBuf = (byte[]) msg.obj;
                     String readMessage = new String(readBuf, 0, msg.arg1);
-                    Toast.makeText(getApplicationContext(), readMessage, Toast.LENGTH_LONG).show();
-                    //Intent i = new Intent(getApplicationContext(), MainActivity.class);
+                    if(readMessage.equals("request"))
+                    {
+                        //ide alert
+                        Toast.makeText(getApplicationContext(), deviceName, Toast.LENGTH_LONG).show();
+
+                        /*AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
+                        builder.setTitle(deviceName + " želi da postanete prijatelji");
+                        builder.setPositiveButton("Odbij", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                String tmp = "responseNo";
+                                mService.write(tmp.getBytes());
+                            }
+                        });
+                        builder.setNegativeButton("Prihvati", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                String tmp = "responseYes";
+                                mService.write(tmp.getBytes());
+                            }
+                        });
+                        AlertDialog dialog = builder.create();
+                        dialog.show();*/
+                        /*Intent i = new Intent(getApplicationContext(), FriendRequestActivity.class);
+                        i.putExtra("device", deviceName);
+                        startActivity(i);*/
+                    }
+                    else if (readMessage.equals("responseYes"))
+                    {
+                        //salji serveru i upisi u lokalnu bazu
+                        Toast.makeText(getApplicationContext(), "responseYes", Toast.LENGTH_LONG).show();
+                    }
+                    else
+                        Toast.makeText(getApplicationContext(), "Zahtev za prijateljstvom odbijen!", Toast.LENGTH_LONG).show();
                     break;
             }
         }
@@ -163,7 +202,7 @@ public class BluetoothActivity extends Activity
 
     public void onSendRequestBtn(View view)
     {
-        sendMessage("Ovo sam ti ja poslao!");
+        sendMessage("request");
     }
 
     public void onDetectBtn(View view)
@@ -171,19 +210,25 @@ public class BluetoothActivity extends Activity
         // ovde samo za probu
         ensureDiscoverable();
 
-        progress.setVisibility(View.VISIBLE);
-        detectBtn.setClickable(false);
-        detDevices.setVisibility(View.GONE);
+        if(onOff)
+        {
+            progress.setVisibility(View.VISIBLE);
+            detectBtn.setClickable(false);
+            detDevices.setVisibility(View.GONE);
 
-        if(mNewDevicesArrayAdapter.getCount() != 0) {
-            mNewDevicesArrayAdapter.clear();
-            mNewDevicesArrayAdapter.notifyDataSetChanged();
+            if(mNewDevicesArrayAdapter.getCount() != 0) {
+                mNewDevicesArrayAdapter.clear();
+                mNewDevicesArrayAdapter.notifyDataSetChanged();
+            }
+
+            if(mBtAdapter.isDiscovering())
+                mBtAdapter.cancelDiscovery();
+
+            mBtAdapter.startDiscovery();
         }
+        else
+            Toast.makeText(getApplicationContext(), "Morate prvo uključiti Bluetooth!", Toast.LENGTH_LONG).show();
 
-        if(mBtAdapter.isDiscovering())
-            mBtAdapter.cancelDiscovery();
-
-        mBtAdapter.startDiscovery();
     }
 
     private void ensureDiscoverable()
