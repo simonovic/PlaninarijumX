@@ -2,6 +2,7 @@ package rs.elfak.mosis.planinarijumx;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -39,6 +40,7 @@ public class RegistrationActivity extends Activity
     ImageView viewImage;
     Button b;
     String imageName = null;
+    Uri mCapturedImageURI;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -60,7 +62,11 @@ public class RegistrationActivity extends Activity
             public void onClick(DialogInterface dialog, int item) {
                 if(options[item].equals("Slikaj"))
                 {
+                    ContentValues values = new ContentValues();
+                    values.put(MediaStore.Images.Media.TITLE, "Image File name");
+                    mCapturedImageURI = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, mCapturedImageURI);
                     if (intent.resolveActivity(getPackageManager()) != null)
                         startActivityForResult(intent, 1);
                 }
@@ -109,7 +115,13 @@ public class RegistrationActivity extends Activity
                 + "\n" + brtel + "\n";
 
         final File f = new File(imageName);
-        NovaOsoba novaOsoba = new NovaOsoba(brtel,ime,pass,prezime,imgName,username,f.length());
+        NovaOsoba novaOsoba;
+        if(f.exists())
+            novaOsoba = new NovaOsoba(brtel,ime,pass,prezime,imgName,username,f.length());
+        else
+            {
+                novaOsoba = new NovaOsoba(brtel,ime,pass,prezime,imgName,username,0);
+            }
 
         final String sendBuff = "0\n" + novaOsoba.toString()+"\n";
 
@@ -122,17 +134,19 @@ public class RegistrationActivity extends Activity
                     PrintWriter printWriter = new PrintWriter(socket.getOutputStream(),true);
                     printWriter.write(sendBuff);
                     printWriter.flush();
+                    OutputStream dataOutputStreamput= socket.getOutputStream();
+                    if(f.exists()) {
 
-                    OutputStream dataOutputStreamput = socket.getOutputStream();
-                    FileInputStream fileInputStream = new FileInputStream(f);
-                    byte imgBuff[] = new byte[(int)f.length()];
-                    fileInputStream.read(imgBuff);
-                    dataOutputStreamput.write(imgBuff);
-                    dataOutputStreamput.flush();
+                       // dataOutputStreamput ;
+                        FileInputStream fileInputStream = new FileInputStream(f);
+                        byte imgBuff[] = new byte[(int) f.length()];
+                        fileInputStream.read(imgBuff);
+                        dataOutputStreamput.write(imgBuff);
+                        dataOutputStreamput.flush();
+                    }
                     printWriter.close();
                     dataOutputStreamput.close();
                     socket.close();
-                    imgBuff = null;
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -154,7 +168,9 @@ public class RegistrationActivity extends Activity
         {
             if (requestCode == 1)
             {
-                Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
+                //Uri selectedImage = data.getData();
+                imageName = getRealPathFromUri(mCapturedImageURI);
+                Bitmap thumbnail = (BitmapFactory.decodeFile(imageName));
                 int nh = (int)(thumbnail.getHeight()*(512.0/thumbnail.getWidth()));
                 Bitmap scaled = Bitmap.createScaledBitmap(thumbnail, 512, nh, true);
                 viewImage.setImageBitmap(scaled);
@@ -177,6 +193,22 @@ public class RegistrationActivity extends Activity
                 Bitmap scaled = Bitmap.createScaledBitmap(thumbnail, 512, nh, true);
                 viewImage.setImageBitmap(scaled);
             }
+        }
+    }
+
+    private String getRealPathFromUri(Uri selectedImage) {
+
+        try
+        {
+            String[] proj = {MediaStore.Images.Media.DATA};
+            Cursor cursor = getContentResolver().query(selectedImage, proj, null, null, null);
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        }
+        catch (Exception e)
+        {
+            return selectedImage.getPath();
         }
     }
 }
