@@ -24,9 +24,7 @@
         android:hint="@string/kor_ime1"
         android:layout_marginRight="40dp"
         android:inputType="text"
-        android:focusable="false"
-        android:nextFocusUp="@id/korIme"
-        android:nextFocusLeft="@id/korIme"/>
+        />
 
     <EditText
         android:id="@+id/lozinka"
@@ -39,8 +37,7 @@
         android:layout_alignStart="@+id/korIme"
         android:textColor="#33b5e5"
         android:layout_marginRight="40dp"
-        android:inputType="textPassword"
-        android:focusable="false" />
+        android:inputType="textPassword" />
 
     <Button
         android:id="@+id/prijavaBtn"
