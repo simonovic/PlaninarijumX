@@ -21,7 +21,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -106,19 +108,44 @@ public class RegistrationActivity extends Activity
         sendBuf = "0\n" + username + "\n" + pass + "\n" + ime + "\n" + prezime + "\n" + imgName
                 + "\n" + brtel + "\n";
 
+        final File f = new File(imageName);
+        NovaOsoba novaOsoba = new NovaOsoba(brtel,ime,pass,prezime,imgName,username,f.length());
 
-        try {
+        final String sendBuff = "0\n" + novaOsoba.toString()+"\n";
 
-            InetAddress adr=InetAddress.getByName(MainActivity.address);
-            Socket socket = new Socket(adr,MainActivity.PORT);
-            PrintWriter printWriter = new PrintWriter(socket.getOutputStream(),true);
-            printWriter.write(sendBuf);
-            printWriter.flush();
-            printWriter.close();
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+
+                    InetAddress adr=InetAddress.getByName(MainActivity.address);
+                    Socket socket = new Socket(adr,MainActivity.PORT);
+                    PrintWriter printWriter = new PrintWriter(socket.getOutputStream(),true);
+                    printWriter.write(sendBuff);
+                    printWriter.flush();
+
+                    OutputStream dataOutputStreamput = socket.getOutputStream();
+                    FileInputStream fileInputStream = new FileInputStream(f);
+                    byte imgBuff[] = new byte[(int)f.length()];
+                    fileInputStream.read(imgBuff);
+                    dataOutputStreamput.write(imgBuff);
+                    dataOutputStreamput.flush();
+                    printWriter.close();
+                    dataOutputStreamput.close();
+                    socket.close();
+                    imgBuff = null;
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+        }).start();
+
 
     }
 
@@ -149,7 +176,7 @@ public class RegistrationActivity extends Activity
                 c.close();
                 Bitmap thumbnail = (BitmapFactory.decodeFile(picturePath));
                 File f = new File(picturePath);
-                imageName = f.getName();
+                imageName = picturePath;
                 int nh = (int)(thumbnail.getHeight()*(512.0/thumbnail.getWidth()));
                 Bitmap scaled = Bitmap.createScaledBitmap(thumbnail, 512, nh, true);
                 viewImage.setImageBitmap(scaled);

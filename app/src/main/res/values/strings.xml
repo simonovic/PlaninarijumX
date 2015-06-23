@@ -47,4 +47,5 @@
     <string name="start_solving">Počni kviz</string>
     <string name="title_activity_my_profile">Moj profil</string>
     <string name="title_activity_friends_list">Prijatelja</string>
+    <string name="empty_space">Popuni odgovarajuća polja</string>
 </resources>
