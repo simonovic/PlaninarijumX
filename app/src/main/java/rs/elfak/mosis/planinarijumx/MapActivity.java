@@ -28,6 +28,7 @@ import android.widget.Toast;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -49,6 +50,7 @@ public class MapActivity extends ActionBarActivity
     private CharSequence mTitle;
     private GoogleMap map;
     private ArrayList<Place> quest;
+    LatLng Simon = new LatLng(43.319425, 21.899487);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,13 +87,14 @@ public class MapActivity extends ActionBarActivity
 
     public void onSectionAttached(final int number) {
         invalidateOptionsMenu();
+        map.clear();
         switch (number) {
             case 1:
                 mTitle = getString(R.string.title_section1);
                 break;
             case 2:
                 mTitle = getString(R.string.title_section2);
-                AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this, AlertDialog.THEME_TRADITIONAL);
+                AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
                 builder.setMessage("Poruka").setTitle("Izaberi radius u metrima");
                 final NumberPicker picker = new NumberPicker(MapActivity.this);
 
@@ -108,6 +111,9 @@ public class MapActivity extends ActionBarActivity
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         Toast.makeText(getApplicationContext(), "Idi do servera" + picker.getValue() , Toast.LENGTH_SHORT).show();
+                        CircleOptions circleOptions = new CircleOptions().center(Simon).
+                                radius(picker.getValue()).fillColor(0x4033B5E5).strokeColor(0x00000000);//51 181 229
+                        map.addCircle(circleOptions);
                     }
                 });
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -130,7 +136,7 @@ public class MapActivity extends ActionBarActivity
                     public void onMapLongClick(final LatLng latLng) {
                         if(mNavigationDrawerFragment.getmCurrentSelectedPosition() == 3)
                         {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this);
+                            AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this,AlertDialog.THEME_TRADITIONAL);
                             LayoutInflater inflater = MapActivity.this.getLayoutInflater();
                             final View view = inflater.inflate(R.layout.place_layout,null);
                             builder.setView(view)
