@@ -24,6 +24,7 @@
     <string name="title_section2">Mesta u blizini</string>
     <string name="title_section3">Prikazi prijatelje</string>
     <string name="title_section4">Dodaj kviz</string>
+    <string name="title_section5">Reši kviz</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -36,4 +37,5 @@
     <string name="Done">Završi</string>
     <string name="question">Pitanje</string>
     <string name="answer">Odgovor</string>
+    <string name="start_solving">Počni kviz</string>
 </resources>

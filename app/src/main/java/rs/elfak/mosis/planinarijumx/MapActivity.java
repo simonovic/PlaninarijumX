@@ -34,6 +34,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 
 public class MapActivity extends ActionBarActivity
@@ -50,7 +51,9 @@ public class MapActivity extends ActionBarActivity
     private CharSequence mTitle;
     private GoogleMap map;
     private ArrayList<Place> quest;
+    private ArrayList<Place> fakeQuest;
     LatLng Simon = new LatLng(43.319425, 21.899487);
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +79,29 @@ public class MapActivity extends ActionBarActivity
         map.setMyLocationEnabled(true);
     }
 
+    private void popuniQuest()
+    {
+        if(fakeQuest != null)
+        {
+            fakeQuest.clear();
+        }
+        fakeQuest = new ArrayList<Place>();
+        double lat = Simon.latitude;
+        double lng = Simon.longitude;
+
+        Random r = new Random();
+        int broj = r.nextInt(10);
+        for (int i = 0; i < broj; i++)
+        {
+            double faktor = r.nextDouble();
+            faktor = faktor - 0.5;
+            faktor = faktor / 2.0;
+            Place p = new Place(lat + faktor, lng + faktor,"odg"+i,"pitanje"+i);
+            fakeQuest.add(p);
+        }
+        Place.ID = 0;
+    }
+
     @Override
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
@@ -98,12 +124,6 @@ public class MapActivity extends ActionBarActivity
                 builder.setMessage("Poruka").setTitle("Izaberi radius u metrima");
                 final NumberPicker picker = new NumberPicker(MapActivity.this);
 
-               /* int broj = picker.getChildCount();
-                for(int i = 0; i < broj; i++)
-                {
-                    View v = picker.getChildAt(i);
-                    ((EditText)v).setTextColor(Color.WHITE);
-                }*/
                 picker.setMinValue(1);
                 picker.setMaxValue(10000);
                 builder.setView(picker);
@@ -127,6 +147,7 @@ public class MapActivity extends ActionBarActivity
                 break;
             case 3:
                 mTitle = getString(R.string.title_section3);
+                popuniQuest();
                 break;
             case 4:
                 mTitle = getString(R.string.title_section4);
@@ -136,7 +157,7 @@ public class MapActivity extends ActionBarActivity
                     public void onMapLongClick(final LatLng latLng) {
                         if(mNavigationDrawerFragment.getmCurrentSelectedPosition() == 3)
                         {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this,AlertDialog.THEME_TRADITIONAL);
+                            AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this,AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
                             LayoutInflater inflater = MapActivity.this.getLayoutInflater();
                             final View view = inflater.inflate(R.layout.place_layout,null);
                             builder.setView(view)
@@ -165,6 +186,62 @@ public class MapActivity extends ActionBarActivity
                             alertDialog.show();
 
                         }
+                    }
+                });
+                break;
+            case 5:
+                mTitle = getString(R.string.title_section5);
+                final QuestSolver questSolver = new QuestSolver(fakeQuest);
+                Place pitanje = questSolver.getPitanje();
+                if(pitanje == null)
+                    Toast.makeText(getApplicationContext(), "Cestitam, resio si.", Toast.LENGTH_SHORT)
+                            .show();
+                map.addMarker(new MarkerOptions().
+                        position(new LatLng(pitanje.getLat(),pitanje.getLng()))
+                        .title(pitanje.getPitanje()));
+                Toast.makeText(getApplicationContext(), "Odgovor:"+pitanje.getOdgovor(), Toast.LENGTH_SHORT).show();
+                map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker marker) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this,AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+                        LayoutInflater inflater = MapActivity.this.getLayoutInflater();
+                        final View view = inflater.inflate(R.layout.place_layout,null);
+                        ((EditText)view.findViewById(R.id.add_question)).setText(marker.getTitle());
+                        ((EditText)view.findViewById(R.id.add_question)).setKeyListener(null);
+                        builder.setView(view)
+                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i)
+                                    {
+                                        String odg = ((EditText)view.findViewById(R.id.add_answer)).getText().toString();
+                                        boolean b = questSolver.Solve(odg);
+                                        if(b == true)
+                                        {
+                                            Place pit = questSolver.getPitanje();
+                                            if(pit == null)
+                                                Toast.makeText(getApplicationContext(), "Cestitam, resio si.", Toast.LENGTH_SHORT)
+                                                        .show();
+                                            map.addMarker(new MarkerOptions().
+                                                    position(new LatLng(pit.getLat(), pit.getLng()))
+                                                    .title(pit.getPitanje()));
+                                            Toast.makeText(getApplicationContext(), "Odgovor:"+pit.getOdgovor(), Toast.LENGTH_SHORT)
+                                                    .show();
+                                        }
+                                        else
+                                            Toast.makeText(getApplicationContext(), "Pogresio si", Toast.LENGTH_SHORT).show();
+
+                                    }
+                                })
+                                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        Toast.makeText(getApplicationContext(), "Odustao si", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                        AlertDialog alertDialog = builder.create();
+                        alertDialog.show();
+
+                        return true;
                     }
                 });
                 break;
