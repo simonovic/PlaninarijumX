@@ -64,7 +64,7 @@
             android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyAXAsCI2AvXk2lyR8j76PJhcaVJAbedg-E" />
+            android:value="AIzaSyBsF30Ss4_PlUiHnu8ckHorqzwNSZsZBPY" />
 
         <activity
             android:name=".BluetoothActivity"
@@ -73,6 +73,15 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="rs.elfak.mosis.planinarijumx.MainActivity" />
+        </activity>
+        <activity
+            android:name=".FriendRequestActivity"
+            android:label="@string/title_activity_friend_request"
+            android:parentActivityName=".BluetoothActivity"
+            android:theme="@android:style/Theme.Holo.Dialog">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="rs.elfak.mosis.planinarijumx.BluetoothActivity" />
         </activity>
     </application>
 

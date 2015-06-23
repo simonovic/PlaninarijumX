@@ -2,7 +2,9 @@ package rs.elfak.mosis.planinarijumx;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,15 +20,26 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class MainActivity extends Activity
 {
-
+    String username;
+    SharedPreferences shPref;
+    public static final String loginpref = "LoginPref";
+    public static final String userpref = "user";
+    public static final String passpref = "pass";
     Handler handler;
     Runnable runnable;
     LatLng myLocation = new LatLng(43.319425, 21.899487);
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        shPref = getSharedPreferences(loginpref, Context.MODE_PRIVATE);
+
+        //Bundle extras = getIntent().getExtras();
+        //username = extras.getString("user");
+        //password = extras.getString("pass");
 
         /*handler = new Handler();
         runnable = new Runnable() {
@@ -45,8 +58,8 @@ public class MainActivity extends Activity
             @Override
             public void onMyLocationChange(Location location) {
                 myLocation = new LatLng(location.getLatitude(),location.getLongitude());
-                Toast.makeText(getApplicationContext(),"Update sam lokaciju" + myLocation.latitude
-                        + "  " + myLocation.longitude, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(),"Update sam lokaciju" + myLocation.latitude
+                        //+ "  " + myLocation.longitude, Toast.LENGTH_SHORT).show();
             }
         };
     }
@@ -85,9 +98,19 @@ public class MainActivity extends Activity
             case R.id.profil:
                 break;
             case R.id.logout:
+                SharedPreferences.Editor editor = shPref.edit();
+                editor.putString(userpref, null);
+                editor.commit();
+                Intent ii = new Intent(this, LogActivity.class);
+                startActivity(ii);
                 break;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
     }
 }

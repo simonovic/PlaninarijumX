@@ -14,12 +14,8 @@ public class LogActivity extends Activity
 {
     public static final String loginpref = "LoginPref";
     public static final String userpref = "user";
-    public static final String passpref = "pass";
     SharedPreferences shPref;
-    EditText user;
-    EditText pass;
     String username;
-    String password;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -27,14 +23,11 @@ public class LogActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_log);
         shPref = getSharedPreferences(loginpref, Context.MODE_PRIVATE);
-        user = (EditText)findViewById(R.id.korIme);
-        pass = (EditText)findViewById(R.id.lozinka);
-        SharedPreferences.Editor editor = shPref.edit();
         username = shPref.getString(userpref, null);
-        password = shPref.getString(passpref, null);
-        if (username != null)
+        if ((username != "") && (username != null))
         {
             Intent i = new Intent(this, MainActivity.class);
+            i.putExtra("user", username);
             startActivity(i);
         }
     }
@@ -61,13 +54,12 @@ public class LogActivity extends Activity
             else
             {
                 SharedPreferences.Editor editor = shPref.edit();
-                username = user.getText().toString();
-                password = pass.getText().toString();
+                username = ime.getText().toString();
                 editor.putString(userpref, username);
-                editor.putString(passpref, password);
+                editor.commit();
+                username = shPref.getString(userpref, null);
                 Intent i = new Intent(this, MainActivity.class);
                 i.putExtra("user", username);
-                i.putExtra("pass", password);
                 startActivity(i);
             }
         }
