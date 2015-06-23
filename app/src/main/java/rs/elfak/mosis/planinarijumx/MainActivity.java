@@ -1,7 +1,6 @@
 package rs.elfak.mosis.planinarijumx;
 
 import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,9 +9,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
@@ -87,14 +83,8 @@ public class MainActivity extends Activity
                 startActivity(i);
                 break;
             case R.id.bluetooth:
-                BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-                if (bluetoothAdapter == null)
-                    Toast.makeText(getApplicationContext(), "Uređaj ne podržava Bluetooth!", Toast.LENGTH_LONG).show();
-                else
-                {
-                    Intent in = new Intent(this, BluetoothActivity.class);
-                    startActivity(in);
-                }
+                Intent in = new Intent(this, FriendsListActivity.class);
+                startActivity(in);
                 break;
             case R.id.profil:
                 Intent inn = new Intent(this, MyProfileActivity.class);
