@@ -17,20 +17,26 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.util.StringTokenizer;
 
 
 public class RegistrationActivity extends Activity
 {
     ImageView viewImage;
     Button b;
-
+    String imageName = null;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -70,6 +76,52 @@ public class RegistrationActivity extends Activity
         builder.show();
     }
 
+    public void registrujMe(View view)
+    {
+        String username,pass,ime,prezime,brtel,sendBuf,imgName;
+        imgName = "";
+        username = ((EditText) findViewById(R.id.korIme1)).getText().toString();
+        pass = ((EditText) findViewById(R.id.lozinka1)).getText().toString();
+        ime = ((EditText) findViewById(R.id.ime)).getText().toString();
+        prezime = ((EditText) findViewById(R.id.prezime)).getText().toString();
+        brtel = ((EditText) findViewById(R.id.brtel)).getText().toString();
+
+        if((username.isEmpty()) || (pass.isEmpty()))
+        {
+            Toast.makeText(this,getString(R.string.empty_space),Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+       // ImageView imageView = (ImageView) findViewById(R.id.imageView);
+
+        //imgName = getResources().getResourceName((int) imageView.getTag());
+
+        StringTokenizer stringTokenizer = new StringTokenizer(imageName,"/");
+
+        while(stringTokenizer.hasMoreElements())
+        {
+            imgName = stringTokenizer.nextToken();
+        }
+
+        sendBuf = "0\n" + username + "\n" + pass + "\n" + ime + "\n" + prezime + "\n" + imgName
+                + "\n" + brtel + "\n";
+
+
+        try {
+
+            InetAddress adr=InetAddress.getByName(MainActivity.address);
+            Socket socket = new Socket(adr,MainActivity.PORT);
+            PrintWriter printWriter = new PrintWriter(socket.getOutputStream(),true);
+            printWriter.write(sendBuf);
+            printWriter.flush();
+            printWriter.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
@@ -87,6 +139,8 @@ public class RegistrationActivity extends Activity
             else if(requestCode == 2)
             {
                 Uri selectedImage = data.getData();
+                //File f = new File("" + selectedImage.getPath());
+                //imageName = f.getName();
                 String[] filePath = { MediaStore.Images.Media.DATA};
                 Cursor c = getContentResolver().query(selectedImage, filePath, null, null, null);
                 c.moveToFirst();
@@ -94,6 +148,8 @@ public class RegistrationActivity extends Activity
                 String picturePath = c.getString(columnIndex);
                 c.close();
                 Bitmap thumbnail = (BitmapFactory.decodeFile(picturePath));
+                File f = new File(picturePath);
+                imageName = f.getName();
                 int nh = (int)(thumbnail.getHeight()*(512.0/thumbnail.getWidth()));
                 Bitmap scaled = Bitmap.createScaledBitmap(thumbnail, 512, nh, true);
                 viewImage.setImageBitmap(scaled);
