@@ -17,7 +17,7 @@ import android.widget.Toast;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 
-
+//0 - Registracija
 public class MainActivity extends Activity
 {
     String username;
@@ -25,6 +25,8 @@ public class MainActivity extends Activity
     public static final String loginpref = "LoginPref";
     public static final String userpref = "user";
     public static final String passpref = "pass";
+    public static final String address = "192.168.1.10";
+    public static final int PORT = 4444;
     Handler handler;
     Runnable runnable;
     static LatLng myLocation = new LatLng(43.319425, 21.899487);
