@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -17,13 +18,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -32,17 +29,17 @@ import java.util.ArrayList;
 //0 - Registracija
 public class MainActivity extends Activity
 {
-    String username;
+    int userID;
     SharedPreferences shPref;
     public static final String loginpref = "LoginPref";
-    public static final String userpref = "user";
-    public static final String passpref = "pass";
+    public static final String userIDpref = "userID";
     public static final String address = "192.168.1.10";
     public static final int PORT = 4443;
     private static final String request = "5\nplanine\n";
     Handler handler;
     Runnable runnable;
     static LatLng myLocation = new LatLng(43.319425, 21.899487);
+    private ArrayList<Planina> planine;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -53,7 +50,7 @@ public class MainActivity extends Activity
         shPref = getSharedPreferences(loginpref, Context.MODE_PRIVATE);
 
         //Bundle extras = getIntent().getExtras();
-        //username = extras.getString("user");
+        //userID = extras.getInt("userID");
 
         /*handler = new Handler();
         runnable = new Runnable() {
@@ -81,9 +78,7 @@ public class MainActivity extends Activity
                     Gson gson = new GsonBuilder().serializeNulls().create();
                     ArrayList<Planina> planine = gson.fromJson(pl, new TypeToken<ArrayList<Planina>>(){}.getType());
 
-                    //Toast.makeText(getApplicationContext(), planine.get(0).toString(), Toast.LENGTH_LONG).show();
                     String pom = planine.get(0).toString();
-                    Log.v("PlaninarijumX", planine.get(0).toString() + "\n");
 
                     printWriter.close();
                     socket.close();
@@ -138,7 +133,7 @@ public class MainActivity extends Activity
                 break;
             case R.id.logout:
                 SharedPreferences.Editor editor = shPref.edit();
-                editor.putString(userpref, null);
+                editor.putInt(userIDpref, 0);
                 editor.commit();
                 Intent ii = new Intent(this, LogActivity.class);
                 startActivity(ii);

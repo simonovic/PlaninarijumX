@@ -13,9 +13,9 @@ import android.widget.Toast;
 public class LogActivity extends Activity
 {
     public static final String loginpref = "LoginPref";
-    public static final String userpref = "user";
+    public static final String userIDpref = "userID";
     SharedPreferences shPref;
-    String username;
+    int userID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -23,11 +23,11 @@ public class LogActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_log);
         shPref = getSharedPreferences(loginpref, Context.MODE_PRIVATE);
-        username = shPref.getString(userpref, null);
-        if ((username != "") && (username != null))
+        userID = shPref.getInt(userIDpref, 0);
+        if (userID != 0)
         {
             Intent i = new Intent(this, MainActivity.class);
-            i.putExtra("user", username);
+            i.putExtra("userID", userID);
             startActivity(i);
         }
     }
@@ -54,12 +54,12 @@ public class LogActivity extends Activity
             else
             {
                 SharedPreferences.Editor editor = shPref.edit();
-                username = ime.getText().toString();
-                editor.putString(userpref, username);
+                userID = response;
+                editor.putInt(userIDpref, userID);
                 editor.commit();
-                username = shPref.getString(userpref, null);
+                userID = shPref.getInt(userIDpref, 0);
                 Intent i = new Intent(this, MainActivity.class);
-                i.putExtra("user", username);
+                i.putExtra("userID", userID);
                 startActivity(i);
             }
         }

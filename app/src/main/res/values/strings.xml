@@ -22,6 +22,8 @@
     <string name="rang">Rang:</string>
     <string name="friendd">Dodaj prijatelja</string>
     <string name="friends">Prijatelja</string>
+    <string name="zavrseniQ">Završeni kvizovi:</string>
+    <string name="zapocetiQ">Započeti kvizovi:</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_mapa">Mapa</string>
@@ -32,6 +34,7 @@
     <string name="title_section3">Prikazi prijatelje</string>
     <string name="title_section4">Dodaj kviz</string>
     <string name="title_section5">Reši kviz</string>
+    <string name="empty_space">Reši kviz</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

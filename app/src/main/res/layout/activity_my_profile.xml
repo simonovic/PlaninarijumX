@@ -84,13 +84,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="10dp">
+            android:paddingTop="5dp">
 
             <TextView
                 android:text="@string/rang"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp" />
+                android:layout_marginTop="10dp"
+                android:paddingTop="10dp" />
 
             <EditText
                 android:layout_width="0dp"
@@ -98,7 +99,8 @@
                 android:phoneNumber="true"
                 android:id="@+id/rang"
                 android:focusable="false"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:paddingBottom="10dp" />
 
             <TextView
                 android:text="@string/poeni"
@@ -113,9 +115,37 @@
                 android:phoneNumber="true"
                 android:id="@+id/poeni"
                 android:focusable="false"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:paddingBottom="10dp" />
 
         </LinearLayout>
+
+        <TextView
+            android:text="@string/zapocetiQ"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:gravity="top"/>
+
+        <Spinner
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/spinner"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="5dp" />
+
+        <TextView
+            android:text="@string/zavrseniQ"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp" />
+
+        <Spinner
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/spinner2"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="5dp" />
 
     </LinearLayout>
 
