@@ -99,6 +99,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="rs.elfak.mosis.planinarijumx.MainActivity" />
         </activity>
+        <activity
+            android:name=".PlaninaActivity"
+            android:label="@string/title_activity_planina"
+            android:parentActivityName=".MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="rs.elfak.mosis.planinarijumx.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

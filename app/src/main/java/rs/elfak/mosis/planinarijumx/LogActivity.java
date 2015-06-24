@@ -12,8 +12,6 @@ import android.widget.Toast;
 
 public class LogActivity extends Activity
 {
-    public static final String loginpref = "LoginPref";
-    public static final String userIDpref = "userID";
     SharedPreferences shPref;
     int userID;
 
@@ -22,8 +20,8 @@ public class LogActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_log);
-        shPref = getSharedPreferences(loginpref, Context.MODE_PRIVATE);
-        userID = shPref.getInt(userIDpref, 0);
+        shPref = getSharedPreferences(Constants.loginpref, Context.MODE_PRIVATE);
+        userID = shPref.getInt(Constants.userIDpref, 0);
         if (userID != 0)
         {
             Intent i = new Intent(this, MainActivity.class);
@@ -55,9 +53,9 @@ public class LogActivity extends Activity
             {
                 SharedPreferences.Editor editor = shPref.edit();
                 userID = response;
-                editor.putInt(userIDpref, userID);
+                editor.putInt(Constants.userIDpref, userID);
                 editor.commit();
-                userID = shPref.getInt(userIDpref, 0);
+                userID = shPref.getInt(Constants.userIDpref, 0);
                 Intent i = new Intent(this, MainActivity.class);
                 i.putExtra("userID", userID);
                 startActivity(i);

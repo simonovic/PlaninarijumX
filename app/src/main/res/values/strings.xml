@@ -12,7 +12,7 @@
     <string name="loz">Lozinka:</string>
     <string name="br_tel">Broj telefona:</string>
     <string name="slika">Dodaj sliku</string>
-    <string name="title_activity_main">PlaninarijumX</string>
+    <string name="title_activity_main">Planine</string>
     <string name="det_uredjaji">Pronađi uređaje</string>
     <string name="title_activity_bluetooth">Prijatelji</string>
     <string name="brtelefona">Broj telefona:</string>
@@ -49,5 +49,6 @@
     <string name="answer">Odgovor</string>
     <string name="start_solving">Počni kviz</string>
     <string name="title_activity_my_profile">Moj profil</string>
-    <string name="title_activity_friends_list">Prijatelja</string>
+    <string name="title_activity_friends_list">Prijatelji</string>
+    <string name="title_activity_planina">PlaninaActivity</string>
 </resources>

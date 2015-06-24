@@ -1,6 +1,7 @@
 package rs.elfak.mosis.planinarijumx;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -10,6 +11,9 @@ import android.widget.EditText;
 
 public class MyProfileActivity extends Activity
 {
+    private int userID;
+    SharedPreferences shPref;
+    private static final String request = "5\nplanine\n";  //promeni da odg profilu
     EditText ime;
     EditText prezime;
     EditText rang;
@@ -27,8 +31,15 @@ public class MyProfileActivity extends Activity
         prezime = (EditText)findViewById(R.id.prezime);
         brTel = (EditText)findViewById(R.id.brtel);
         user = (EditText)findViewById(R.id.korIme1);
-        //rang = (EditText)findViewById(R.id.rang);
+        rang = (EditText)findViewById(R.id.rang);
         brPoena = (EditText)findViewById(R.id.poeni);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        }).start();
     }
 
 }

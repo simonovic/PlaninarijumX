@@ -41,6 +41,7 @@ public class RegistrationActivity extends Activity
     Button b;
     String imageName = null;
     Uri mCapturedImageURI;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -129,8 +130,8 @@ public class RegistrationActivity extends Activity
             @Override
             public void run() {
                 try {
-                    InetAddress adr = InetAddress.getByName(MainActivity.address);
-                    Socket socket = new Socket(adr, MainActivity.PORT);
+                    InetAddress adr = InetAddress.getByName(Constants.address);
+                    Socket socket = new Socket(adr, Constants.PORT);
                     PrintWriter printWriter = new PrintWriter(socket.getOutputStream(),true);
                     printWriter.write(sendBuff);
                     printWriter.flush();

@@ -28,7 +28,7 @@ public class BluetoothActivity extends Activity
 {
     private static final String TAG = "BluetoothActivity";
     private BluetoothAdapter mBtAdapter;
-    private ArrayAdapter<String> mNewDevicesArrayAdapter = null;
+    private ArrayAdapter<String> mNewDevicesArrayAdapter;
     private ListView detDevices;
     private BluetoothService mService = null;
     private String deviceName;
@@ -299,7 +299,6 @@ public class BluetoothActivity extends Activity
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_bluetooth, menu);
         return true;
     }
@@ -307,12 +306,7 @@ public class BluetoothActivity extends Activity
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }

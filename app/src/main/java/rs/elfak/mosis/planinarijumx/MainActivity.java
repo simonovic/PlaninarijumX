@@ -10,6 +10,10 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,6 +22,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import org.w3c.dom.Text;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -25,21 +30,19 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-//0 - Registracija
 public class MainActivity extends Activity
 {
     int userID;
     SharedPreferences shPref;
-    public static final String loginpref = "LoginPref";
-    public static final String userIDpref = "userID";
-    public static final String address = "192.168.1.10";
-    public static final int PORT = 4443;
     private static final String request = "5\nplanine\n";
-    Handler handler;
-    Runnable runnable;
     static LatLng myLocation = new LatLng(43.319425, 21.899487);
     private ArrayList<Planina> planine;
+    private ArrayAdapter<String> planineAdapter;
+    Handler handler;
+    Runnable runnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -47,7 +50,7 @@ public class MainActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        shPref = getSharedPreferences(loginpref, Context.MODE_PRIVATE);
+        shPref = getSharedPreferences(Constants.loginpref, Context.MODE_PRIVATE);
 
         //Bundle extras = getIntent().getExtras();
         //userID = extras.getInt("userID");
@@ -67,8 +70,8 @@ public class MainActivity extends Activity
             public void run() {
                 try {
 
-                    InetAddress adr = InetAddress.getByName(MainActivity.address);
-                    Socket socket = new Socket(adr, MainActivity.PORT);
+                    InetAddress adr = InetAddress.getByName(Constants.address);
+                    Socket socket = new Socket(adr, Constants.PORT);
                     PrintWriter printWriter = new PrintWriter(socket.getOutputStream(),true);
                     printWriter.write(request);
                     printWriter.flush();
@@ -83,7 +86,29 @@ public class MainActivity extends Activity
                     printWriter.close();
                     socket.close();
 
-                } catch (IOException e) {
+                    Planina p1 = new Planina(1,"Ime1", 2000, 43.433, 43.433);
+                    Planina p2 = new Planina(2,"Ime2", 3000, 53.433, 53.433);
+                    Planina p3 = new Planina(3,"Ime3", 4000, 63.433, 63.433);
+
+                    planine = new ArrayList<Planina>();
+                    planine.add(p1);
+                    planine.add(p2);
+                    planine.add(p3);
+                    planine.add(p1);
+                    planine.add(p2);
+                    planine.add(p3);
+                    planine.add(p1);
+                    planine.add(p2);
+                    planine.add(p3);
+                    planine.add(p1);
+                    planine.add(p2);
+                    planine.add(p3);
+                    planine.add(p1);
+                    planine.add(p2);
+
+                    PopuniPlanineList(planine);
+
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -133,7 +158,7 @@ public class MainActivity extends Activity
                 break;
             case R.id.logout:
                 SharedPreferences.Editor editor = shPref.edit();
-                editor.putInt(userIDpref, 0);
+                editor.putInt(Constants.userIDpref, 0);
                 editor.commit();
                 Intent ii = new Intent(this, LogActivity.class);
                 startActivity(ii);
@@ -146,5 +171,27 @@ public class MainActivity extends Activity
     @Override
     public void onBackPressed() {
         moveTaskToBack(true);
+    }
+
+    private AdapterView.OnItemClickListener planinaClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+        {
+            Toast.makeText(getApplicationContext(), "Klik na planinu!", Toast.LENGTH_LONG).show();
+        }
+    };
+
+    private void PopuniPlanineList(ArrayList<Planina> planine)
+    {
+        planineAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1);
+        for (Iterator<Planina> i = planine.iterator(); i.hasNext();)
+        {
+            Planina pl = i.next();
+            planineAdapter.add(pl.getIme());
+            Log.v("PlaninarijumX", pl.getIme());
+        }
+        ListView plListView = (ListView)findViewById(R.id.planinaListView);
+        plListView.setAdapter(planineAdapter);
+        plListView.setOnItemClickListener(planinaClickListener);
     }
 }
