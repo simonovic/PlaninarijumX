@@ -5,8 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,7 +18,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -41,8 +41,9 @@ public class MainActivity extends Activity
     static LatLng myLocation = new LatLng(43.319425, 21.899487);
     private ArrayList<Planina> planine;
     private ArrayAdapter<String> planineAdapter;
-    Handler handler;
-    Runnable runnable;
+    public static LatLng MyLocation =  new LatLng(43.319425, 21.899487);
+    LocationManager locationManager;
+    LocationListener listener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -115,16 +116,39 @@ public class MainActivity extends Activity
         }).start();
     }
 
+    @Override
     protected void onStart() {
         super.onStart();
-        final GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        listener = new LocationListener() {
             @Override
-            public void onMyLocationChange(Location location) {
+            public void onLocationChanged(Location location) {
                 myLocation = new LatLng(location.getLatitude(),location.getLongitude());
-                //Toast.makeText(getApplicationContext(),"Update sam lokaciju" + myLocation.latitude
-                        //+ "  " + myLocation.longitude, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),"Posalji serveru lokaciju", Toast.LENGTH_SHORT).show();
+
+                //TODO: Posalji serveru lokaciju
+
+            }
+
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String s) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String s) {
+
             }
         };
+
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 2000, 0, listener);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 0, listener);
+
 
 
     }
@@ -132,7 +156,9 @@ public class MainActivity extends Activity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //handler.removeCallbacks(runnable);
+        locationManager.removeUpdates(listener);
+        locationManager = null;
+        listener = null;
     }
 
     @Override

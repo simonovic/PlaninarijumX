@@ -76,7 +76,8 @@ public class MapActivity extends ActionBarActivity
                 (DrawerLayout) findViewById(R.id.drawer_layout));
 
         map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
-        map.setMyLocationEnabled(true);
+        if(map != null)
+            map.setMyLocationEnabled(true);
     }
 
     private void popuniQuest()
@@ -203,31 +204,30 @@ public class MapActivity extends ActionBarActivity
                 map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(Marker marker) {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this,AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
                         LayoutInflater inflater = MapActivity.this.getLayoutInflater();
-                        final View view = inflater.inflate(R.layout.place_layout,null);
-                        ((EditText)view.findViewById(R.id.add_question)).setText(marker.getTitle());
-                        ((EditText)view.findViewById(R.id.add_question)).setKeyListener(null);
+                        final View view = inflater.inflate(R.layout.place_layout, null);
+                        ((EditText) view.findViewById(R.id.add_question)).setText(marker.getTitle());
+                        ((EditText) view.findViewById(R.id.add_question)).setKeyListener(null);
                         builder.setView(view)
                                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                     @Override
-                                    public void onClick(DialogInterface dialogInterface, int i)
-                                    {
-                                        String odg = ((EditText)view.findViewById(R.id.add_answer)).getText().toString();
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        String odg = ((EditText) view.findViewById(R.id.add_answer)).getText().toString();
                                         boolean b = questSolver.Solve(odg);
-                                        if(b == true)
-                                        {
+                                        if (b == true) {
                                             Place pit = questSolver.getPitanje();
-                                            if(pit == null)
+                                            if (pit == null) {
                                                 Toast.makeText(getApplicationContext(), "Cestitam, resio si.", Toast.LENGTH_SHORT)
                                                         .show();
-                                            map.addMarker(new MarkerOptions().
-                                                    position(new LatLng(pit.getLat(), pit.getLng()))
-                                                    .title(pit.getPitanje()));
-                                            Toast.makeText(getApplicationContext(), "Odgovor:"+pit.getOdgovor(), Toast.LENGTH_SHORT)
+                                            } else {
+                                                map.addMarker(new MarkerOptions().
+                                                        position(new LatLng(pit.getLat(), pit.getLng()))
+                                                        .title(pit.getPitanje()));
+                                            }
+                                            Toast.makeText(getApplicationContext(), "Odgovor:" + pit.getOdgovor(), Toast.LENGTH_SHORT)
                                                     .show();
-                                        }
-                                        else
+                                        } else
                                             Toast.makeText(getApplicationContext(), "Pogresio si", Toast.LENGTH_SHORT).show();
 
                                     }
