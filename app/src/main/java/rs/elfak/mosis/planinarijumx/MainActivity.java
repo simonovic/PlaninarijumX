@@ -70,7 +70,7 @@ public class MainActivity extends Activity
             public void run() {
                 try {
 
-                    InetAddress adr = InetAddress.getByName(Constants.address);
+                    /*InetAddress adr = InetAddress.getByName(Constants.address);
                     Socket socket = new Socket(adr, Constants.PORT);
                     PrintWriter printWriter = new PrintWriter(socket.getOutputStream(),true);
                     printWriter.write(request);
@@ -79,12 +79,12 @@ public class MainActivity extends Activity
                     BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     String pl = in.readLine();
                     Gson gson = new GsonBuilder().serializeNulls().create();
-                    ArrayList<Planina> planine = gson.fromJson(pl, new TypeToken<ArrayList<Planina>>(){}.getType());
+                    planine = gson.fromJson(pl, new TypeToken<ArrayList<Planina>>(){}.getType());
 
                     String pom = planine.get(0).toString();
 
                     printWriter.close();
-                    socket.close();
+                    socket.close();*/
 
                     Planina p1 = new Planina(1,"Ime1", 2000, 43.433, 43.433);
                     Planina p2 = new Planina(2,"Ime2", 3000, 53.433, 53.433);
@@ -125,6 +125,8 @@ public class MainActivity extends Activity
                         //+ "  " + myLocation.longitude, Toast.LENGTH_SHORT).show();
             }
         };
+
+
     }
 
     @Override

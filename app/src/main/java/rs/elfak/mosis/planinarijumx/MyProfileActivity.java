@@ -13,7 +13,7 @@ public class MyProfileActivity extends Activity
 {
     private int userID;
     SharedPreferences shPref;
-    private static final String request = "5\nplanine\n";  //promeni da odg profilu
+    private static final String request = "5\nplanine\n";  //promeni da odg profilu sam
     EditText ime;
     EditText prezime;
     EditText rang;

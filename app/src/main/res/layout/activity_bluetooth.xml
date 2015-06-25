@@ -22,14 +22,6 @@
             android:onClick="onDetectBtn"
             android:layout_marginBottom="20dp" />
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="New Button"
-            android:id="@+id/sendRequstBtn"
-            android:onClick="onSendRequestBtn"
-            android:layout_gravity="right" />
-
         <ListView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
