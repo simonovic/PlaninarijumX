@@ -29,7 +29,9 @@ public class MyProfileActivity extends Activity
     EditText user;
     EditText brPoena;
     OsobaPlus korisnik;
-    private String pl;
+    private final String STATE_PROFIL = "profil";
+    private String profil;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -44,42 +46,56 @@ public class MyProfileActivity extends Activity
         rang = (EditText)findViewById(R.id.rang);
         brPoena = (EditText)findViewById(R.id.poeni);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
+        if (savedInstanceState == null)
+        {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
 
-                    InetAddress adr = InetAddress.getByName(Constants.address);
-                    Socket socket = new Socket(adr, Constants.PORT);
-                    PrintWriter printWriter = new PrintWriter(socket.getOutputStream(),true);
-                    printWriter.write(request);
-                    printWriter.flush();
+                        InetAddress adr = InetAddress.getByName(Constants.address);
+                        Socket socket = new Socket(adr, Constants.PORT);
+                        PrintWriter printWriter = new PrintWriter(socket.getOutputStream(),true);
+                        printWriter.write(request);
+                        printWriter.flush();
 
-                    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    pl = in.readLine();
-                    Gson gson = new GsonBuilder().serializeNulls().create();
-                    korisnik = gson.fromJson(pl, OsobaPlus.class);
+                        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                        profil = in.readLine();
+                        Gson gson = new GsonBuilder().serializeNulls().create();
+                        korisnik = gson.fromJson(profil, OsobaPlus.class);
 
-                    printWriter.close();
-                    socket.close();
+                        printWriter.close();
+                        socket.close();
 
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            ime.setText(korisnik.getIme());
-                            prezime.setText(korisnik.getPrezime());
-                            user.setText(korisnik.getUser());
-                            brTel.setText(korisnik.getBrTelefona());
-                            brPoena.setText(korisnik.getBrPoena()+"");
-                            rang.setText(korisnik.getRank()+"");
-                        }
-                    });
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                ime.setText(korisnik.getIme());
+                                prezime.setText(korisnik.getPrezime());
+                                user.setText(korisnik.getUser());
+                                brTel.setText(korisnik.getBrTelefona());
+                                brPoena.setText(korisnik.getBrPoena()+"");
+                                rang.setText(korisnik.getRank()+"");
+                            }
+                        });
 
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        }).start();
+            }).start();
+        }
+        else
+        {
+
+        }
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle savedInstanceState)
+    {
+        savedInstanceState.putString(STATE_PROFIL, profil);
+
+        super.onSaveInstanceState(savedInstanceState);
+    }
 }

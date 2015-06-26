@@ -23,55 +23,64 @@
 
         <TextView android:text="@string/ime"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:textSize="17dp"
+            android:layout_marginTop="10dp" />
 
         <EditText
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:inputType="text"
             android:id="@+id/ime"
             android:nextFocusUp="@id/ime"
             android:nextFocusLeft="@id/ime"
-            android:focusable="false"/>
+            android:focusable="false"
+            android:textColor="#33b5e5" />
 
         <TextView
             android:text="@string/prezime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp" />
+            android:layout_marginTop="14dp"
+            android:textSize="17dp" />
 
         <EditText
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:inputType="text"
             android:id="@+id/prezime"
-            android:focusable="false"/>
+            android:focusable="false"
+            android:textColor="#33b5e5" />
 
         <TextView
             android:text="@string/kor_ime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp" />
+            android:layout_marginTop="14dp"
+            android:textSize="17dp" />
 
         <EditText
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:inputType="text"
             android:id="@+id/korIme1"
-            android:focusable="false"/>
+            android:focusable="false"
+            android:textColor="#33b5e5" />
 
         <TextView
             android:text="@string/brtelefona"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp" />
+            android:layout_marginTop="14dp"
+            android:textSize="17dp" />
 
         <EditText
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:phoneNumber="true"
             android:id="@+id/brtel"
-            android:focusable="false" />
+            android:focusable="false"
+            android:textColor="#33b5e5" />
 
         <ImageView
             android:layout_width="wrap_content"
@@ -85,14 +94,15 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:paddingTop="5dp"
-            android:layout_marginTop="2dp">
+            android:layout_marginTop="4dp">
 
             <TextView
                 android:text="@string/rang"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:paddingTop="10dp" />
+                android:paddingTop="10dp"
+                android:textSize="17dp" />
 
             <EditText
                 android:layout_width="0dp"
@@ -101,14 +111,16 @@
                 android:id="@+id/rang"
                 android:focusable="false"
                 android:layout_weight="1"
-                android:paddingBottom="10dp" />
+                android:paddingBottom="10dp"
+                android:textColor="#33b5e5" />
 
             <TextView
                 android:text="@string/poeni"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:layout_marginLeft="10dp" />
+                android:layout_marginLeft="10dp"
+                android:textSize="17dp" />
 
             <EditText
                 android:layout_width="0dp"
@@ -117,7 +129,8 @@
                 android:id="@+id/poeni"
                 android:focusable="false"
                 android:layout_weight="1"
-                android:paddingBottom="10dp" />
+                android:paddingBottom="10dp"
+                android:textColor="#33b5e5" />
 
         </LinearLayout>
 
