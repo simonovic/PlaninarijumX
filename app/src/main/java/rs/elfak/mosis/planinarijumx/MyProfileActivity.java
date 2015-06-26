@@ -85,17 +85,13 @@ public class MyProfileActivity extends Activity
                 }
             }).start();
         }
-        else
-        {
-
-        }
     }
 
-    @Override
+    /*@Override
     protected void onSaveInstanceState(Bundle savedInstanceState)
     {
         savedInstanceState.putString(STATE_PROFIL, profil);
 
         super.onSaveInstanceState(savedInstanceState);
-    }
+    }*/
 }
