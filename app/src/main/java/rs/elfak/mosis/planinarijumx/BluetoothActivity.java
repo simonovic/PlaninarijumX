@@ -23,6 +23,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.os.Handler;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+
 
 public class BluetoothActivity extends Activity
 {
@@ -34,14 +47,13 @@ public class BluetoothActivity extends Activity
     private String deviceName;
     ProgressDialog progressD;
     Button detectBtn;
-    private static final int FRIEND_REQUEST = 10;
     int userID;
     SharedPreferences shPref;
     private boolean sender = false;
-    private ArrayAdapter<String> friendsIDAdapter;
-    String friendsID;
-    String[] friendsIDs;
-
+    private String requestID;
+    private String friendsID = "";
+    private String[] friendsIDs;
+    private String friendDeviceName = "";
     private String[] str;
 
     @Override
@@ -49,6 +61,11 @@ public class BluetoothActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bluetooth);
+
+        Bundle extras = getIntent().getExtras();
+        friendsID = extras.getString("friendsID");
+        friendsIDs = friendsID.split(" ");
+
 
         progressD = new ProgressDialog(this);
         progressD.setOnKeyListener(new DialogInterface.OnKeyListener() {
@@ -61,8 +78,6 @@ public class BluetoothActivity extends Activity
                 return true;
             }
         });
-
-        //friendsIDAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
 
         progressD.setCanceledOnTouchOutside(false);
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -153,22 +168,6 @@ public class BluetoothActivity extends Activity
 
                 mService = new BluetoothService(this, mHandler);
         }
-        else if (requestCode == FRIEND_REQUEST)
-        {
-            if (resultCode == RESULT_OK)
-            {
-                Toast.makeText(getApplicationContext(), "Prihvatio, salji serveru i upisi u lokalnu bazu!", Toast.LENGTH_LONG).show();
-                String message = "responseYes " + deviceName;
-                byte[] send = message.getBytes();
-                mService.write(send);
-            }
-            else if (resultCode == RESULT_CANCELED)
-            {
-                String message = "responseNo " + deviceName;
-                byte[] send = message.getBytes();
-                mService.write(send);
-            }
-        }
     }
 
     private final Handler mHandler = new Handler()
@@ -204,17 +203,28 @@ public class BluetoothActivity extends Activity
                     }
                     else if (tmp[0].equals("responseID"))
                     {
-                        //Provera sa lokalnom bazom da li su prijatelji, ako jesu
-                        String pom = "request " + deviceName;
-                        byte[] pom1 = pom.getBytes();
-                        mService.write(pom1);
+                        requestID = tmp[1];
+                        if (Arrays.asList(friendsIDs).contains(tmp[1]))
+                        {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(BluetoothActivity.this);
+                            builder.setTitle("Prijateljstvo!");
+                            builder.setMessage("Već ste prijatelj sa korisnikom " + friendDeviceName);
+                            builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                }
+                            });
+                            AlertDialog dialog = builder.create();
+                            dialog.show();
+                        }
+                        else
+                        {
+                            String pom = "request " + deviceName;
+                            byte[] pom1 = pom.getBytes();
+                            mService.write(pom1);
+                        }
                     }
                     else if (tmp[0].equals("request"))
                     {
-                        /*Intent i = new Intent(BluetoothActivity.this, FriendRequestActivity.class);
-                        i.putExtra("device", readMessage.substring(8));
-                        startActivityForResult(i, FRIEND_REQUEST);*/
-
                         AlertDialog.Builder builder = new AlertDialog.Builder(BluetoothActivity.this);
                         builder.setTitle("Prijateljstvo!");
                         builder.setMessage("Korisnik " + readMessage.substring(8) + " želi da postanete prijatelji!");
@@ -237,7 +247,6 @@ public class BluetoothActivity extends Activity
                     }
                     else if (tmp[0].equals("responseYes"))
                     {
-                        //salji serveru i upisi u lokalnu bazu
                         RespondeYes(readMessage.substring(12));
                     }
                     else if (tmp[0].equals("responseNo")) {
@@ -266,6 +275,28 @@ public class BluetoothActivity extends Activity
         builder2.setTitle(message + " je prihvatio zahtev za prijateljstvom!");
         builder2.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+
+                            String request = "7\n"+userID+"\n"+requestID+"\n";
+                            InetAddress adr = InetAddress.getByName(Constants.address);
+                            Socket socket = new Socket(adr, Constants.PORT);
+                            PrintWriter printWriter = new PrintWriter(socket.getOutputStream(),true);
+                            printWriter.write(request);
+                            printWriter.flush();
+
+
+
+                            printWriter.close();
+                            socket.close();
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
             }
         });
         AlertDialog dialog = builder2.create();
@@ -285,8 +316,6 @@ public class BluetoothActivity extends Activity
 
     public void onDetectBtn(View view)
     {
-
-
         if(mBtAdapter.isEnabled())
         {
             ensureDiscoverable();
@@ -348,6 +377,7 @@ public class BluetoothActivity extends Activity
             sender = true;
             String info = ((TextView) v).getText().toString();
             str = info.split("\n");
+            friendDeviceName = str[0] + " [" + str[1] + "]";
 
             AlertDialog.Builder builder = new AlertDialog.Builder(BluetoothActivity.this);
             builder.setTitle("Prijateljstvo");

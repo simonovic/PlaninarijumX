@@ -25,18 +25,17 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 
 public class FriendsListActivity extends Activity
 {
     private ArrayList<OsobaReduced> friends;
     private ArrayAdapter<String> friendsAdapter;
-    ListView friendsList;
     int userID;
     SharedPreferences shPref;
     private String request = "4\n";
-    String pl;
+    String prijatelji;
+    String friendsID = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,9 +58,9 @@ public class FriendsListActivity extends Activity
                     printWriter.flush();
 
                     BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    pl = in.readLine();
+                    prijatelji = in.readLine();
                     Gson gson = new GsonBuilder().serializeNulls().create();
-                    friends = gson.fromJson(pl, new TypeToken<ArrayList<OsobaReduced>>(){}.getType());
+                    friends = gson.fromJson(prijatelji, new TypeToken<ArrayList<OsobaReduced>>(){}.getType());
 
                     printWriter.close();
                     socket.close();
@@ -73,6 +72,7 @@ public class FriendsListActivity extends Activity
                             for (Iterator<OsobaReduced> i = friends.iterator(); i.hasNext(); ) {
                                 OsobaReduced os = i.next();
                                 friendsAdapter.add(os.getUser());
+                                friendsID += os.getId()+" ";
                             }
                             ListView friendsList = (ListView) findViewById(R.id.listFriends);
                             friendsList.setAdapter(friendsAdapter);
@@ -113,6 +113,7 @@ public class FriendsListActivity extends Activity
             else
             {
                 Intent in = new Intent(this, BluetoothActivity.class);
+                in.putExtra("friendsID", friendsID);
                 startActivity(in);
             }
         }
