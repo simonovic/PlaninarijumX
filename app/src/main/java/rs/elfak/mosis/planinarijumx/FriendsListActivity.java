@@ -2,40 +2,99 @@ package rs.elfak.mosis.planinarijumx;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 
 public class FriendsListActivity extends Activity
 {
+    private ArrayList<OsobaReduced> friends;
     private ArrayAdapter<String> friendsAdapter;
     ListView friendsList;
+    int userID;
+    SharedPreferences shPref;
+    private String request = "4\n";
+    String pl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friends_list);
 
-        friendsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
-        friendsList = (ListView)findViewById(R.id.listFriends);
-        friendsList.setAdapter(friendsAdapter);
-        friendsAdapter.add("1.");
-        friendsAdapter.add("2.");
-        friendsAdapter.add("3.");
-        friendsAdapter.add("4.");
-        friendsAdapter.add("5.");
+        shPref = getSharedPreferences(Constants.loginpref, Context.MODE_PRIVATE);
+        userID = shPref.getInt(Constants.userIDpref, 0);
+        request += userID+"\n";
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+
+                    InetAddress adr = InetAddress.getByName(Constants.address);
+                    Socket socket = new Socket(adr, Constants.PORT);
+                    PrintWriter printWriter = new PrintWriter(socket.getOutputStream(),true);
+                    printWriter.write(request);
+                    printWriter.flush();
+
+                    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    pl = in.readLine();
+                    Gson gson = new GsonBuilder().serializeNulls().create();
+                    friends = gson.fromJson(pl, new TypeToken<ArrayList<OsobaReduced>>(){}.getType());
+
+                    printWriter.close();
+                    socket.close();
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            friendsAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1);
+                            for (Iterator<OsobaReduced> i = friends.iterator(); i.hasNext(); ) {
+                                OsobaReduced os = i.next();
+                                friendsAdapter.add(os.getUser());
+                            }
+                            ListView friendsList = (ListView) findViewById(R.id.listFriends);
+                            friendsList.setAdapter(friendsAdapter);
+                            friendsList.setOnItemClickListener(friendClickListener);
+                        }
+                    });
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
-    public ArrayAdapter<String> getFriendsAdapter() {
-        return friendsAdapter;
-    }
+    private AdapterView.OnItemClickListener friendClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+        {
+            Toast.makeText(getApplicationContext(), "Klik na prijatelja!", Toast.LENGTH_LONG).show();
+        }
+    };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -7,6 +7,6 @@ public class Constants
 {
     public static final String loginpref = "LoginPref";
     public static final String userIDpref = "userID";
-    public static final String address = "192.168.1.10";
-    public static final int PORT = 4443;
+    public static final String address = "178.220.95.133";
+    public static final int PORT = 3000;
 }

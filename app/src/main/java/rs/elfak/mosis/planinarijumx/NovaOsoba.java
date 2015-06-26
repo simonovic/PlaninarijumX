@@ -13,21 +13,21 @@ public class NovaOsoba
     private String prezime;
     private String slika;
     private String brTelefona;
-    private long velicinaSlike;
+    private int velicinaSlike;
 
     private NovaOsoba()
     {
 
     }
 
-    public NovaOsoba(String brTelefona, String ime, String pass, String prezime, String slika, String user,long vS) {
+    public NovaOsoba(String brTelefona, String ime, String pass, String prezime, String slika, String user, int vS) {
         this.brTelefona = brTelefona;
         this.ime = ime;
         this.pass = pass;
         this.prezime = prezime;
         this.slika = slika;
         this.user = user;
-        velicinaSlike = vS;
+        this.velicinaSlike = vS;
     }
 
     public String getBrTelefona() {

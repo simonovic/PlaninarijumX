@@ -43,7 +43,8 @@ public class BluetoothActivity extends Activity
     SharedPreferences shPref;
     private boolean sender = false;
     private ArrayAdapter<String> friendsIDAdapter;
-    private FriendsListActivity friends;
+    String friendsID;
+    String[] friendsIDs;
 
     private String[] str;
 
@@ -65,8 +66,7 @@ public class BluetoothActivity extends Activity
             }
         });
 
-        friendsIDAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
-        //friendsIDAdapter = friends.getFriendsAdapter();
+        //friendsIDAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
 
         progressD.setCanceledOnTouchOutside(false);
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();

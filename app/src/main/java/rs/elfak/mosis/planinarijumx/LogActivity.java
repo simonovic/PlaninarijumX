@@ -44,7 +44,7 @@ public class LogActivity extends Activity
         {
             // provera na sarveru
             int response;
-            response = 111;
+            response = 1;
             //////////////////////
 
             if(response == 0)
@@ -57,7 +57,6 @@ public class LogActivity extends Activity
                 editor.commit();
                 userID = shPref.getInt(Constants.userIDpref, 0);
                 Intent i = new Intent(this, MainActivity.class);
-                i.putExtra("userID", userID);
                 startActivity(i);
             }
         }

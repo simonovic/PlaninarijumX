@@ -117,7 +117,7 @@ public class RegistrationActivity extends Activity
 
         final File f = new File(imageName);
         NovaOsoba novaOsoba;
-        if(f.exists())
+        /*if(f.exists())
             novaOsoba = new NovaOsoba(brtel,ime,pass,prezime,imgName,username,f.length());
         else
             {
@@ -155,7 +155,7 @@ public class RegistrationActivity extends Activity
 
 
             }
-        }).start();
+        }).start();*/
 
 
     }
