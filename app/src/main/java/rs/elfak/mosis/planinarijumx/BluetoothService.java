@@ -23,7 +23,6 @@ public class BluetoothService
 {
     private static final String TAG = "PlaninarijumX";
     private static final String NAME = "PlaninarijumX";
-    //private static final UUID MY_UUID = UUID.fromString("118a2516-eeb1-4eb4-8c33-7fdc7e4afe2f");
     private static final UUID MY_UUID = UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
     public static final int STATE_NONE = 0;       // we're doing nothing
     public static final int STATE_LISTEN = 1;     // now listening for incoming connections

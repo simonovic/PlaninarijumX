@@ -35,6 +35,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 
 public class BluetoothActivity extends Activity
@@ -50,11 +51,13 @@ public class BluetoothActivity extends Activity
     int userID;
     SharedPreferences shPref;
     private boolean sender = false;
-    private String requestID;
+    private String responseID;
     private String friendsID = "";
-    private String[] friendsIDs;
     private String friendDeviceName = "";
+    private String[] friendsIDs1;
+    private ArrayList<String> friendsIDs;
     private String[] str;
+    private final String STATE_FRIENDIDS = "friendids";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -62,10 +65,21 @@ public class BluetoothActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bluetooth);
 
-        Bundle extras = getIntent().getExtras();
-        friendsID = extras.getString("friendsID");
-        friendsIDs = friendsID.split(" ");
+        if (savedInstanceState == null) {
+            Bundle extras = getIntent().getExtras();
+            friendsID = extras.getString("friendsID");
+        }
+        else
+        {
+            friendsID = savedInstanceState.getString(STATE_FRIENDIDS);
+        }
 
+        friendsIDs1 = friendsID.split(" ");
+
+        if (friendsID.equals(""))
+            friendsIDs = new ArrayList();
+        else
+            friendsIDs = new ArrayList(Arrays.asList(friendsIDs1));
 
         progressD = new ProgressDialog(this);
         progressD.setOnKeyListener(new DialogInterface.OnKeyListener() {
@@ -161,6 +175,25 @@ public class BluetoothActivity extends Activity
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle savedInstanceState) {
+
+        friendsID = "";
+        int size = friendsIDs.size();
+        for (int i=0; i<size; i++)
+            if (i == size-1)
+                friendsID += friendsIDs.get(i);
+            else
+                friendsID += friendsIDs.get(i) + " ";
+
+        /*List<String> newList = new ArrayList<String>(friendsIDs);
+        String[] pom = new String[newList.size()];
+        pom = newList.toArray(pom);
+        String pom1 = Arrays.toString(pom);*/
+        savedInstanceState.putString(STATE_FRIENDIDS, friendsID);
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1) {
@@ -203,8 +236,8 @@ public class BluetoothActivity extends Activity
                     }
                     else if (tmp[0].equals("responseID"))
                     {
-                        requestID = tmp[1];
-                        if (Arrays.asList(friendsIDs).contains(tmp[1]))
+                        responseID = tmp[1];
+                        if (friendsIDs.contains(tmp[1]))
                         {
                             AlertDialog.Builder builder = new AlertDialog.Builder(BluetoothActivity.this);
                             builder.setTitle("Prijateljstvo!");
@@ -252,6 +285,10 @@ public class BluetoothActivity extends Activity
                     else if (tmp[0].equals("responseNo")) {
                         RespondeNo(readMessage.substring(11));
                     }
+                    else if (tmp[0].equals("Success"))
+                    {
+                        friendsIDs.add(tmp[1]);
+                    }
                     break;
             }
         }
@@ -280,17 +317,36 @@ public class BluetoothActivity extends Activity
                     public void run() {
                         try {
 
-                            String request = "7\n"+userID+"\n"+requestID+"\n";
+                            /*String request = "7\n"+userID+"\n"+responseID+"\n";
                             InetAddress adr = InetAddress.getByName(Constants.address);
                             Socket socket = new Socket(adr, Constants.PORT);
                             PrintWriter printWriter = new PrintWriter(socket.getOutputStream(),true);
                             printWriter.write(request);
                             printWriter.flush();
 
-
+                            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                            String serverResponse = in.readLine();
 
                             printWriter.close();
-                            socket.close();
+                            socket.close();*/
+
+                            String serverResponse = "true";
+                            if (serverResponse.equals("false"))
+                            {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+
+                                    }
+                                });
+                            }
+                            else
+                            {
+                                friendsIDs.add(responseID);
+                                String m = "Success " + userID;
+                                byte[] m1 = m.getBytes();
+                                mService.write(m1);
+                            }
 
                         } catch (Exception e) {
                             e.printStackTrace();
