@@ -1,8 +1,11 @@
 package rs.elfak.mosis.planinarijumx;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.EditText;
 
 import com.google.gson.Gson;
@@ -21,7 +24,7 @@ public class MyProfileActivity extends Activity
 {
     private int userID;
     SharedPreferences shPref;
-    private static final String request = "1\n1\n";
+    private String request;
     EditText ime;
     EditText prezime;
     EditText rang;
@@ -46,6 +49,16 @@ public class MyProfileActivity extends Activity
         rang = (EditText)findViewById(R.id.rang);
         brPoena = (EditText)findViewById(R.id.poeni);
 
+        brTel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String s = ((EditText) v).getText().toString();
+                Intent i = new Intent(Intent.ACTION_CALL);
+                i.setData(Uri.parse("tel:" + s));
+                startActivity(i);
+            }
+        });
+
         if (savedInstanceState == null)
         {
             new Thread(new Runnable() {
@@ -56,6 +69,7 @@ public class MyProfileActivity extends Activity
                         InetAddress adr = InetAddress.getByName(Constants.address);
                         Socket socket = new Socket(adr, Constants.PORT);
                         PrintWriter printWriter = new PrintWriter(socket.getOutputStream(),true);
+                        request = "1\n" + LogActivity.userID+"\n";
                         printWriter.write(request);
                         printWriter.flush();
 

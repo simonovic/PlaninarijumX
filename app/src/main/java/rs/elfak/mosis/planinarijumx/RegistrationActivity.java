@@ -3,8 +3,10 @@ package rs.elfak.mosis.planinarijumx;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -22,12 +24,14 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
@@ -113,8 +117,8 @@ public class RegistrationActivity extends Activity
         final File f = new File(imageName);
         NovaOsoba novaOsoba;
 
-        /*if(f.exists())
-            novaOsoba = new NovaOsoba(brtel,ime,pass,prezime,imgName,username,f.length());
+        if(f.exists())
+            novaOsoba = new NovaOsoba(brtel,ime,pass,prezime,imgName,username, (int) f.length());
         else
             novaOsoba = new NovaOsoba(brtel,ime,pass,prezime,imgName,username,0);
 
@@ -138,9 +142,29 @@ public class RegistrationActivity extends Activity
                         dataOutputStreamput.write(imgBuff);
                         dataOutputStreamput.flush();
                     }
+
+                    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    String prijem = in.readLine();
                     printWriter.close();
                     dataOutputStreamput.close();
+                    in.close();
                     socket.close();
+                    if(prijem != null) {
+                        if (prijem.equals("false"))
+                            Toast.makeText(RegistrationActivity.this
+                                    , "Neuspelo kreiranje naloga", Toast.LENGTH_SHORT).show();
+                        else
+                        {
+                            SharedPreferences shPref = getSharedPreferences(Constants.loginpref, Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = shPref.edit();
+                            //userID = response;
+                            editor.putInt(Constants.userIDpref, 1);
+                            editor.commit();
+                           // userID = shPref.getInt(Constants.userIDpref, 0);
+                            Intent i = new Intent(RegistrationActivity.this, MainActivity.class);
+                            startActivity(i);
+                        }
+                    }
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -148,7 +172,7 @@ public class RegistrationActivity extends Activity
 
 
             }
-        }).start();*/
+        }).start();
 
 
     }

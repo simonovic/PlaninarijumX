@@ -52,7 +52,6 @@ public class MapActivity extends ActionBarActivity
     private GoogleMap map;
     private ArrayList<Place> quest;
     private ArrayList<Place> fakeQuest;
-    LatLng Simon = new LatLng(43.319425, 21.899487);
 
 
     @Override
@@ -68,7 +67,6 @@ public class MapActivity extends ActionBarActivity
         mDrawerLayout.closeDrawers();
 
         mTitle = getTitle();
-        //mNavigationDrawerFragment.clo
 
         // Set up the drawer.
         mNavigationDrawerFragment.setUp(
@@ -225,8 +223,6 @@ public class MapActivity extends ActionBarActivity
                                                         position(new LatLng(pit.getLat(), pit.getLng()))
                                                         .title(pit.getPitanje()));
                                             }
-                                            Toast.makeText(getApplicationContext(), "Odgovor:" + pit.getOdgovor(), Toast.LENGTH_SHORT)
-                                                    .show();
                                         } else
                                             Toast.makeText(getApplicationContext(), "Pogresio si", Toast.LENGTH_SHORT).show();
 

@@ -132,43 +132,51 @@ public class MainActivity extends Activity
     @Override
     protected void onStart() {
         super.onStart();
-        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        listener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                myLocation = new LatLng(location.getLatitude(),location.getLongitude());
-                Toast.makeText(getApplicationContext(),"Posalji serveru lokaciju", Toast.LENGTH_SHORT).show();
+        if(locationManager == null) {
+            locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+            listener = new LocationListener() {
+                @Override
+                public void onLocationChanged(Location location) {
+                    myLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                    Toast.makeText(getApplicationContext(), "Posalji serveru lokaciju", Toast.LENGTH_SHORT).show();
 
-                //TODO: Posalji serveru lokaciju
+                    //TODO: Posalji serveru lokaciju
 
-            }
+                }
 
-            @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {
+                @Override
+                public void onStatusChanged(String s, int i, Bundle bundle) {
 
-            }
+                }
 
-            @Override
-            public void onProviderEnabled(String s) {
+                @Override
+                public void onProviderEnabled(String s) {
 
-            }
+                }
 
-            @Override
-            public void onProviderDisabled(String s) {
+                @Override
+                public void onProviderDisabled(String s) {
 
-            }
-        };
+                }
+            };
 
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 2000, 0, listener);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 0, listener);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 2000, 0, listener);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 0, listener);
+        }
+    }
+
+    private void disconnect()
+    {
+        locationManager.removeUpdates(listener);
+        locationManager = null;
+        listener = null;
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        locationManager.removeUpdates(listener);
-        locationManager = null;
-        listener = null;
+        disconnect();
+
     }
 
     @Override
@@ -195,10 +203,12 @@ public class MainActivity extends Activity
                 startActivity(inn);
                 break;
             case R.id.logout:
+                disconnect();
                 SharedPreferences.Editor editor = shPref.edit();
                 editor.putInt(Constants.userIDpref, 0);
                 editor.commit();
                 Intent ii = new Intent(this, LogActivity.class);
+
                 startActivity(ii);
                 break;
         }
@@ -208,6 +218,7 @@ public class MainActivity extends Activity
 
     @Override
     public void onBackPressed() {
+        disconnect();
         moveTaskToBack(true);
     }
 
