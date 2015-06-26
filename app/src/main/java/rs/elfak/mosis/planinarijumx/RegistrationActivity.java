@@ -87,7 +87,7 @@ public class RegistrationActivity extends Activity
 
     public void registrujMe(View view)
     {
-        String username,pass,ime,prezime,brtel,sendBuf,imgName;
+        String username,pass,ime,prezime,brtel,imgName;
         imgName = "";
         username = ((EditText) findViewById(R.id.korIme1)).getText().toString();
         pass = ((EditText) findViewById(R.id.lozinka1)).getText().toString();
@@ -101,9 +101,6 @@ public class RegistrationActivity extends Activity
             return;
         }
 
-       // ImageView imageView = (ImageView) findViewById(R.id.imageView);
-
-        //imgName = getResources().getResourceName((int) imageView.getTag());
 
         StringTokenizer stringTokenizer = new StringTokenizer(imageName,"/");
 
@@ -112,17 +109,14 @@ public class RegistrationActivity extends Activity
             imgName = stringTokenizer.nextToken();
         }
 
-        sendBuf = "0\n" + username + "\n" + pass + "\n" + ime + "\n" + prezime + "\n" + imgName
-                + "\n" + brtel + "\n";
 
         final File f = new File(imageName);
         NovaOsoba novaOsoba;
-        if(f.exists())
+
+        /*if(f.exists())
             novaOsoba = new NovaOsoba(brtel,ime,pass,prezime,imgName,username,f.length());
         else
-            {
-                novaOsoba = new NovaOsoba(brtel,ime,pass,prezime,imgName,username,0);
-            }
+            novaOsoba = new NovaOsoba(brtel,ime,pass,prezime,imgName,username,0);
 
         final String sendBuff = "0\n" + novaOsoba.toString()+"\n";
 
@@ -138,7 +132,6 @@ public class RegistrationActivity extends Activity
                     OutputStream dataOutputStreamput= socket.getOutputStream();
                     if(f.exists()) {
 
-                       // dataOutputStreamput ;
                         FileInputStream fileInputStream = new FileInputStream(f);
                         byte imgBuff[] = new byte[(int) f.length()];
                         fileInputStream.read(imgBuff);
@@ -155,7 +148,7 @@ public class RegistrationActivity extends Activity
 
 
             }
-        }).start();
+        }).start();*/
 
 
     }
@@ -169,7 +162,6 @@ public class RegistrationActivity extends Activity
         {
             if (requestCode == 1)
             {
-                //Uri selectedImage = data.getData();
                 imageName = getRealPathFromUri(mCapturedImageURI);
                 Bitmap thumbnail = (BitmapFactory.decodeFile(imageName));
                 int nh = (int)(thumbnail.getHeight()*(512.0/thumbnail.getWidth()));

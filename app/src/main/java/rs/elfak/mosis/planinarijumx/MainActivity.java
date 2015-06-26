@@ -8,6 +8,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -55,9 +56,6 @@ public class MainActivity extends Activity
 
         shPref = getSharedPreferences(Constants.loginpref, Context.MODE_PRIVATE);
 
-        //Bundle extras = getIntent().getExtras();
-        //userID = extras.getInt("userID");
-
         /*handler = new Handler();
         runnable = new Runnable() {
             @Override
@@ -100,24 +98,6 @@ public class MainActivity extends Activity
                             plListView.setOnItemClickListener(planinaClickListener);
                         }
                     });
-
-                    planine = new ArrayList<Planina>();
-                    planine.add(p1);
-                    planine.add(p2);
-                    planine.add(p3);
-                    planine.add(p1);
-                    planine.add(p2);
-                    planine.add(p3);
-                    planine.add(p1);
-                    planine.add(p2);
-                    planine.add(p3);
-                    planine.add(p1);
-                    planine.add(p2);
-                    planine.add(p3);
-                    planine.add(p1);
-                    planine.add(p2);
-
-                    PopuniPlanineList(planine);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -165,9 +145,6 @@ public class MainActivity extends Activity
 
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 2000, 0, listener);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 0, listener);
-
-
-
     }
 
     @Override
