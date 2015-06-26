@@ -47,6 +47,7 @@ public class MainActivity extends Activity
     public static LatLng MyLocation =  new LatLng(43.319425, 21.899487);
     LocationManager locationManager;
     LocationListener listener;
+    private final String STATE_PLANINE = "planine";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -66,12 +67,14 @@ public class MainActivity extends Activity
         };
         handler.postDelayed(runnable, 13000);*/;
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
+        if (savedInstanceState == null)
+        {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
 
-                    /*InetAddress adr = InetAddress.getByName(Constants.address);
+                    InetAddress adr = InetAddress.getByName(Constants.address);
                     Socket socket = new Socket(adr, Constants.PORT);
                     PrintWriter printWriter = new PrintWriter(socket.getOutputStream(),true);
                     printWriter.write(request);
@@ -79,51 +82,57 @@ public class MainActivity extends Activity
 
                     BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     pl = in.readLine();
-
+                    Gson gson = new GsonBuilder().serializeNulls().create();
                     planine = gson.fromJson(pl, new TypeToken<ArrayList<Planina>>() {}.getType());
 
                     printWriter.close();
-                    socket.close();*/
+                    socket.close();
 
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            /*planineAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                            planineAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1);
                             for (Iterator<Planina> i = planine.iterator(); i.hasNext(); ) {
                                 Planina pl = i.next();
                                 planineAdapter.add(pl.getIme());
                             }
                             ListView plListView = (ListView) findViewById(R.id.planinaListView);
                             plListView.setAdapter(planineAdapter);
-                            plListView.setOnItemClickListener(planinaClickListener);*/
-
-                            Planina pl = new Planina(1, "ImePlanine", 2000, 43.4313, 43.4333);
-                            planineAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1);
-                            planineAdapter.add(pl.getIme());
-                            ListView plListView = (ListView) findViewById(R.id.planinaListView);
-                            plListView.setAdapter(planineAdapter);
                             plListView.setOnItemClickListener(planinaClickListener);
+                            }
+                        });
 
-                            planine = new ArrayList<Planina>();
-                            planine.add(pl);
-                        }
-                    });
-
-
-
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
+            }).start();
+        }
+        else
+        {
+            pl = savedInstanceState.getString(STATE_PLANINE);
+            Gson gson = new GsonBuilder().serializeNulls().create();
+            planine = new ArrayList<Planina>();
+            planine = gson.fromJson(pl, new TypeToken<ArrayList<Planina>>() {}.getType());
+
+            planineAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1);
+            for (Iterator<Planina> i = planine.iterator(); i.hasNext(); ) {
+                Planina pl = i.next();
+                planineAdapter.add(pl.getIme());
             }
-        }).start();
+            ListView plListView = (ListView) findViewById(R.id.planinaListView);
+            plListView.setAdapter(planineAdapter);
+            plListView.setOnItemClickListener(planinaClickListener);
+        }
     }
 
-    /*@Override
-    protected void onSaveInstanceState(Bundle outState) {
+    @Override
+    protected void onSaveInstanceState(Bundle savedInstanceState)
+    {
+        savedInstanceState.putString(STATE_PLANINE, pl);
 
-
-        super.onSaveInstanceState(outState);
-    }*/
+        super.onSaveInstanceState(savedInstanceState);
+    }
 
     @Override
     protected void onStart() {
@@ -219,21 +228,4 @@ public class MainActivity extends Activity
             startActivity(i);
         }
     };
-
-    private void PopuniPlanineList()
-    {
-        Gson gson = new GsonBuilder().serializeNulls().create();
-        planine = gson.fromJson(pl, new TypeToken<ArrayList<Planina>>(){}.getType());
-
-        planineAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1);
-        for (Iterator<Planina> i = planine.iterator(); i.hasNext();)
-        {
-            Planina pl = i.next();
-            planineAdapter.add(pl.getIme());
-            Log.v("PlaninarijumX", pl.getIme());
-        }
-        ListView plListView = (ListView)findViewById(R.id.planinaListView);
-        plListView.setAdapter(planineAdapter);
-        plListView.setOnItemClickListener(planinaClickListener);
-    }
 }
