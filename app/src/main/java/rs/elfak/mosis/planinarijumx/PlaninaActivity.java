@@ -5,13 +5,26 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
-public class PlaninaActivity extends Activity {
+
+public class PlaninaActivity extends Activity
+{
+    String plString;
+    Planina pl;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_planina);
+
+        Bundle extras = getIntent().getExtras();
+        plString = extras.getString("planina");
+        Gson gson = new GsonBuilder().serializeNulls().create();
+        pl = gson.fromJson(plString, Planina.class);
+
     }
 
     @Override

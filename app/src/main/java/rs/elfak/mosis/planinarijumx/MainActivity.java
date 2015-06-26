@@ -71,7 +71,7 @@ public class MainActivity extends Activity
             public void run() {
                 try {
 
-                    InetAddress adr = InetAddress.getByName(Constants.address);
+                    /*InetAddress adr = InetAddress.getByName(Constants.address);
                     Socket socket = new Socket(adr, Constants.PORT);
                     PrintWriter printWriter = new PrintWriter(socket.getOutputStream(),true);
                     printWriter.write(request);
@@ -79,25 +79,37 @@ public class MainActivity extends Activity
 
                     BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     pl = in.readLine();
-                    Gson gson = new GsonBuilder().serializeNulls().create();
+
                     planine = gson.fromJson(pl, new TypeToken<ArrayList<Planina>>() {}.getType());
 
                     printWriter.close();
-                    socket.close();
+                    socket.close();*/
 
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            planineAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1);
+                            /*planineAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1);
                             for (Iterator<Planina> i = planine.iterator(); i.hasNext(); ) {
                                 Planina pl = i.next();
                                 planineAdapter.add(pl.getIme());
                             }
                             ListView plListView = (ListView) findViewById(R.id.planinaListView);
                             plListView.setAdapter(planineAdapter);
+                            plListView.setOnItemClickListener(planinaClickListener);*/
+
+                            Planina pl = new Planina(1, "ImePlanine", 2000, 43.4313, 43.4333);
+                            planineAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1);
+                            planineAdapter.add(pl.getIme());
+                            ListView plListView = (ListView) findViewById(R.id.planinaListView);
+                            plListView.setAdapter(planineAdapter);
                             plListView.setOnItemClickListener(planinaClickListener);
+
+                            planine = new ArrayList<Planina>();
+                            planine.add(pl);
                         }
                     });
+
+
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -199,7 +211,12 @@ public class MainActivity extends Activity
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id)
         {
-            Toast.makeText(getApplicationContext(), "Klik na planinu!", Toast.LENGTH_LONG).show();
+            Gson gson = new GsonBuilder().serializeNulls().create();
+            Planina pl = planine.get(position);
+            String plString = gson.toJson(pl);
+            Intent i = new Intent(MainActivity.this, PlaninaActivity.class);
+            i.putExtra("planina", plString);
+            startActivity(i);
         }
     };
 

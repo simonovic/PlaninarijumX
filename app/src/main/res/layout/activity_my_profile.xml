@@ -38,7 +38,7 @@
             android:text="@string/prezime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp" />
+            android:layout_marginTop="12dp" />
 
         <EditText
             android:layout_width="match_parent"
@@ -51,7 +51,7 @@
             android:text="@string/kor_ime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp" />
+            android:layout_marginTop="12dp" />
 
         <EditText
             android:layout_width="match_parent"
@@ -64,7 +64,7 @@
             android:text="@string/brtelefona"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp" />
+            android:layout_marginTop="12dp" />
 
         <EditText
             android:layout_width="match_parent"
@@ -84,7 +84,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:paddingTop="5dp">
+            android:paddingTop="5dp"
+            android:layout_marginTop="2dp">
 
             <TextView
                 android:text="@string/rang"
