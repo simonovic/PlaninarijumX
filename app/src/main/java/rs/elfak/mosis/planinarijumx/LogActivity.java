@@ -9,11 +9,18 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
 public class LogActivity extends Activity
 {
     SharedPreferences shPref;
-    int userID;
+    static int userID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -32,33 +39,71 @@ public class LogActivity extends Activity
 
     public void onPrijavaBtn(View view)
     {
-        EditText ime = (EditText)findViewById(R.id.korIme);
-        EditText loz = (EditText)findViewById(R.id.lozinka);
+        final EditText ime = (EditText)findViewById(R.id.korIme);
+        final EditText loz = (EditText)findViewById(R.id.lozinka);
         if(ime.getText().toString().trim().equals("") || loz.getText().toString().trim().equals(""))
         {
-            //Toast.makeText(getApplicationContext(), "Morate uneti i korisničko ime i lozinku!", Toast.LENGTH_LONG).show();
-            Intent i = new Intent(this, MainActivity.class);
-            startActivity(i);
+            Toast.makeText(getApplicationContext(), "Morate uneti i korisničko ime i lozinku!", Toast.LENGTH_LONG).show();
+            //Intent i = new Intent(this, MainActivity.class);
+            //startActivity(i);
+
         }
         else
         {
-            // provera na sarveru
-            int response;
-            response = 4;
-            //////////////////////
 
-            if(response == 0)
-                Toast.makeText(getApplicationContext(), "Pogrešno korisničko ime i/ili lozinka!", Toast.LENGTH_LONG).show();
-            else
-            {
-                SharedPreferences.Editor editor = shPref.edit();
-                userID = response;
-                editor.putInt(Constants.userIDpref, userID);
-                editor.commit();
-                userID = shPref.getInt(Constants.userIDpref, 0);
-                Intent i = new Intent(this, MainActivity.class);
-                startActivity(i);
-            }
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+
+
+                    int response;
+                    response = 0;
+
+                    try {
+                        InetAddress adr = InetAddress.getByName(Constants.address);
+                        Socket socket = new Socket(adr, Constants.PORT);
+                        PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
+                        String sendBuf = "6\n";
+                        sendBuf += ime.getText().toString();
+                        sendBuf += "\n" + loz.getText().toString() + "\n";
+                        printWriter.write(sendBuf);
+                        printWriter.flush();
+                        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                        String prijem = in.readLine();
+                        response = Integer.parseInt(prijem);
+                        in.close();
+                        printWriter.close();
+                        socket.close();
+
+                        if (response <= 0) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getApplicationContext(),
+                                            "Pogrešno korisničko ime i/ili lozinka!", Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        }
+                        else {
+                            SharedPreferences.Editor editor = shPref.edit();
+                            userID = response;
+                            editor.putInt(Constants.userIDpref, userID);
+                            editor.commit();
+                            userID = shPref.getInt(Constants.userIDpref, 0);
+                            Intent i = new Intent(LogActivity.this, MainActivity.class);
+                            startActivity(i);
+                        }
+                    }
+                    catch (UnknownHostException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }).start();
+
+
         }
     }
 

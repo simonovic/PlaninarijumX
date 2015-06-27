@@ -30,12 +30,12 @@
     <string name="action_mapa">Mapa</string>
     <string name="title_activity_map">Map Activity</string>
 
-    <string name="title_section1">Section 1</string>
+    <string name="title_section1">Prikaži moju lokaciju</string>
     <string name="title_section2">Mesta u blizini</string>
     <string name="title_section3">Prikazi prijatelje</string>
     <string name="title_section4">Dodaj kviz</string>
     <string name="title_section5">Reši kviz</string>
-    <string name="empty_space">Reši kviz</string>
+    <string name="empty_space">Popuni prazna mesta</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
