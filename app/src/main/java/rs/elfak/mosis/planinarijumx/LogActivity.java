@@ -44,8 +44,8 @@ public class LogActivity extends Activity
         if(ime.getText().toString().trim().equals("") || loz.getText().toString().trim().equals(""))
         {
             Toast.makeText(getApplicationContext(), "Morate uneti i korisničko ime i lozinku!", Toast.LENGTH_LONG).show();
-            //Intent i = new Intent(this, MainActivity.class);
-            //startActivity(i);
+            Intent i = new Intent(this, MainActivity.class);
+            startActivity(i);
 
         }
         else
