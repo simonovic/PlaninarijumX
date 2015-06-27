@@ -1,0 +1,9 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="rs.elfak.mosis.planinarijumx.QuestsActivity">
+
+    <item android:id="@+id/quests" android:title="@string/kvizovi"
+        android:orderInCategory="100" app:showAsAction="ifRoom" />
+
+</menu>

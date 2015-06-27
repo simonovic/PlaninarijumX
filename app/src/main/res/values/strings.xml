@@ -24,6 +24,7 @@
     <string name="friends">Prijatelja</string>
     <string name="zavrseniQ">Završeni kvizovi:</string>
     <string name="zapocetiQ">Započeti kvizovi:</string>
+    <string name="kvizovi">Kvizovi</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_mapa">Mapa</string>
@@ -51,4 +52,5 @@
     <string name="title_activity_my_profile">Moj profil</string>
     <string name="title_activity_friends_list">Prijatelji</string>
     <string name="title_activity_planina">PlaninaActivity</string>
+    <string name="title_activity_quests">Kvizovi</string>
 </resources>

@@ -44,7 +44,7 @@ public class LogActivity extends Activity
         {
             // provera na sarveru
             int response;
-            response = 1;
+            response = 4;
             //////////////////////
 
             if(response == 0)

@@ -69,19 +69,10 @@
         <activity
             android:name=".BluetoothActivity"
             android:label="@string/title_activity_bluetooth"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName=".FriendsListActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="rs.elfak.mosis.planinarijumx.MainActivity" />
-        </activity>
-        <activity
-            android:name=".FriendRequestActivity"
-            android:label="@string/title_activity_friend_request"
-            android:parentActivityName=".BluetoothActivity"
-            android:theme="@android:style/Theme.Holo.Dialog" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="rs.elfak.mosis.planinarijumx.BluetoothActivity" />
         </activity>
         <activity
             android:name=".MyProfileActivity"
@@ -106,6 +97,14 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="rs.elfak.mosis.planinarijumx.MainActivity" />
+        </activity>
+        <activity
+            android:name=".QuestsActivity"
+            android:label="@string/title_activity_quests"
+            android:parentActivityName=".MyProfileActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="rs.elfak.mosis.planinarijumx.MyProfileActivity" />
         </activity>
     </application>
 

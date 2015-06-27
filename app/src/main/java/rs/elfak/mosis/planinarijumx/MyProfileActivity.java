@@ -1,8 +1,11 @@
 package rs.elfak.mosis.planinarijumx;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.EditText;
 
 import com.google.gson.Gson;
@@ -29,7 +32,6 @@ public class MyProfileActivity extends Activity
     EditText user;
     EditText brPoena;
     OsobaPlus korisnik;
-    private final String STATE_PROFIL = "profil";
     private String profil;
 
 
@@ -87,11 +89,21 @@ public class MyProfileActivity extends Activity
         }
     }
 
-    /*@Override
-    protected void onSaveInstanceState(Bundle savedInstanceState)
-    {
-        savedInstanceState.putString(STATE_PROFIL, profil);
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.meny_my_profile, menu);
+        return true;
+    }
 
-        super.onSaveInstanceState(savedInstanceState);
-    }*/
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.quests) {
+            Intent i = new Intent(this, QuestsActivity.class);
+            startActivity(i);
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 }

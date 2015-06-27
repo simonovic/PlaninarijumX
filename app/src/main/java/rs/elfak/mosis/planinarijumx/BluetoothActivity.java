@@ -176,7 +176,6 @@ public class BluetoothActivity extends Activity
 
     @Override
     protected void onSaveInstanceState(Bundle savedInstanceState) {
-
         friendsID = "";
         int size = friendsIDs.size();
         for (int i=0; i<size; i++)
@@ -184,11 +183,6 @@ public class BluetoothActivity extends Activity
                 friendsID += friendsIDs.get(i);
             else
                 friendsID += friendsIDs.get(i) + " ";
-
-        /*List<String> newList = new ArrayList<String>(friendsIDs);
-        String[] pom = new String[newList.size()];
-        pom = newList.toArray(pom);
-        String pom1 = Arrays.toString(pom);*/
         savedInstanceState.putString(STATE_FRIENDIDS, friendsID);
         super.onSaveInstanceState(savedInstanceState);
     }
@@ -290,6 +284,9 @@ public class BluetoothActivity extends Activity
                         friendsIDs.add(tmp[1]);
                     }
                     break;
+                case 5:
+                    Toast.makeText(BluetoothActivity.this, "Konekcija je neuspela, pokušajte ponovo!", Toast.LENGTH_LONG).show();
+                    break;
             }
         }
     };
@@ -346,6 +343,7 @@ public class BluetoothActivity extends Activity
                                 String m = "Success " + userID;
                                 byte[] m1 = m.getBytes();
                                 mService.write(m1);
+                                mService.start();
                             }
 
                         } catch (Exception e) {
@@ -359,21 +357,12 @@ public class BluetoothActivity extends Activity
         dialog.show();
     }
 
-    private void sendMessage(String message)
-    {
-        if (mService.getState() != mService.STATE_CONNECTED) {
-            Toast.makeText(getApplicationContext(), "Uređaji nisu povezani!", Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        byte[] send = message.getBytes();
-        mService.write(send);
-    }
-
     public void onDetectBtn(View view)
     {
         if(mBtAdapter.isEnabled())
         {
+            //mService.start();
+
             ensureDiscoverable();
 
             progressD.setTitle("Bluetooth");
