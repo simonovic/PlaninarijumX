@@ -34,7 +34,6 @@ public class MyProfileActivity extends Activity
     EditText user;
     EditText brPoena;
     OsobaPlus korisnik;
-    private final String STATE_PROFIL = "profil";
     private String profil;
 
 
