@@ -3,6 +3,8 @@ package rs.elfak.mosis.planinarijumx;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.Fragment;
@@ -33,6 +35,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -51,8 +60,9 @@ public class MapActivity extends ActionBarActivity
     private CharSequence mTitle;
     private GoogleMap map;
     private ArrayList<Place> quest;
+    private String questName;
     private ArrayList<Place> fakeQuest;
-
+    private int planinaID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +76,8 @@ public class MapActivity extends ActionBarActivity
 
         mDrawerLayout.closeDrawers();
 
+
+
         mTitle = getTitle();
 
         // Set up the drawer.
@@ -76,6 +88,16 @@ public class MapActivity extends ActionBarActivity
         map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
         if(map != null)
             map.setMyLocationEnabled(true);
+
+        Intent i = getIntent();
+        planinaID = i.getIntExtra("planinaID",-3);
+        if(planinaID != -3)
+        {
+            mNavigationDrawerFragment.setMenuVisibility(false);
+            mNavigationDrawerFragment.selectItem(3);
+            //preimenujMe = true;
+        }
+
     }
 
     private void popuniQuest()
@@ -150,6 +172,30 @@ public class MapActivity extends ActionBarActivity
                 break;
             case 4:
                 mTitle = getString(R.string.title_section4);
+
+                AlertDialog.Builder builderName = new AlertDialog.Builder(MapActivity.this);
+                builderName.setTitle("Naziv kviza");
+                final EditText imeKviza = new EditText(MapActivity.this);
+                imeKviza.setHint("Naziv kviza");
+                builderName.setView(imeKviza);
+                builderName.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (planinaID != -3)
+                            finish();
+                        else
+                            mNavigationDrawerFragment.selectItem(0);
+                    }
+                });
+                builderName.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        questName = imeKviza.getText().toString();
+                    }
+                });
+                AlertDialog alertDia = builderName.create();
+                alertDia.setCanceledOnTouchOutside(false);
+                alertDia.show();
                 quest = new ArrayList<Place>();
                 map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
                     @Override
@@ -282,12 +328,64 @@ public class MapActivity extends ActionBarActivity
         }
         else if(id == R.id.action_done_adding_places)
         {
-            Toast.makeText(this,"Posalji serveru",Toast.LENGTH_SHORT).show();
-            quest.clear();
-            quest = null;
-            map.clear();
-            mNavigationDrawerFragment.selectItem(0);
-            Place.ID = 0;
+            //Toast.makeText(this,"Posalji serveru",Toast.LENGTH_SHORT).show();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+
+                    String sendBuf = "7\n" + questName + "\n" + planinaID + "\n" + LogActivity.userID + "\n";
+                    sendBuf += quest.size() + "\n";
+
+                    try {
+                        InetAddress  adr = InetAddress.getByName(Constants.address);
+
+                        Socket socket = new Socket(adr, Constants.PORT);
+                        PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
+                        printWriter.write(sendBuf);
+                        for(int i = 0; i < quest.size(); i++)
+                        {
+                            Place p = quest.get(i);
+                            NovoMesto novoMesto = new NovoMesto(p.getPitanje(),p.getOdgovor(),p.getLat(),p.getLng(),p.getId());
+                            sendBuf = novoMesto.toString() + "\n";
+                            printWriter.write(sendBuf);
+                        }
+                        printWriter.flush();
+                        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                        final String prijem = in.readLine();
+                        printWriter.close();
+                        in.close();
+                        socket.close();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if(prijem != null) {
+                                    if (prijem.equals("false"))
+                                        Toast.makeText(MapActivity.this
+                                                , "Neuspelo kreiranje kviza", Toast.LENGTH_SHORT).show();
+                                    else
+                                    {
+                                        Toast.makeText(MapActivity.this
+                                                , "Uspesno kreiranje kviza", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                                quest.clear();
+                                quest = null;
+                                Place.ID = 0;
+                                map.clear();
+                                if(planinaID != -3)
+                                    finish();
+                                else
+                                    mNavigationDrawerFragment.selectItem(0);
+                            }
+                        });
+                    } catch (UnknownHostException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }).start();
 
         }
 

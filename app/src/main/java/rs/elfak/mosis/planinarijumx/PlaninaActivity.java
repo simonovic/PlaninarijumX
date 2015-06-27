@@ -1,6 +1,7 @@
 package rs.elfak.mosis.planinarijumx;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,8 +39,11 @@ public class PlaninaActivity extends Activity
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_dodaj_kviz_na_planini)
+        {
+            Intent i = new Intent(this,MapActivity.class);
+            i.putExtra("planinaID",pl.getId());
+            startActivity(i);
         }
 
         return super.onOptionsItemSelected(item);
