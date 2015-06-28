@@ -125,7 +125,6 @@ public class MainActivity extends Activity
     protected void onSaveInstanceState(Bundle savedInstanceState)
     {
         savedInstanceState.putString(STATE_PLANINE, pl);
-
         super.onSaveInstanceState(savedInstanceState);
     }
 
