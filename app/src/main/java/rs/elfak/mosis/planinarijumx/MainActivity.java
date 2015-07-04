@@ -207,8 +207,11 @@ public class MainActivity extends Activity
                 editor.putInt(Constants.userIDpref, 0);
                 editor.commit();
                 Intent ii = new Intent(this, LogActivity.class);
-
                 startActivity(ii);
+                break;
+            case R.id.rank:
+                Intent innn = new Intent(this, RankingActivity.class);
+                startActivity(innn);
                 break;
         }
 

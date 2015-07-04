@@ -5,6 +5,8 @@
 
     <item android:id="@+id/profil"  android:title="@string/profil"
         android:orderInCategory="100" app:showAsAction="ifRoom" />
+    <item android:id="@+id/rank"  android:title="@string/ranglista"
+        android:orderInCategory="100" app:showAsAction="ifRoom" />
     <item android:id="@+id/mapa"  android:title="@string/action_mapa"
         android:orderInCategory="100" app:showAsAction="ifRoom" />
     <item android:id="@+id/bluetooth"  android:title="@string/title_activity_bluetooth"

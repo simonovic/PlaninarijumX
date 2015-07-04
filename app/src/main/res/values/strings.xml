@@ -26,6 +26,8 @@
     <string name="zapocetiQ">Započeti kvizovi:</string>
     <string name="kvizovi">Kvizovi</string>
     <string name="vidljiv">Vidljiv</string>
+    <string name="ranglista">Rang lista</string>
+
 
     <string name="hello_world">Hello world!</string>
     <string name="action_mapa">Mapa</string>
@@ -54,4 +56,5 @@
     <string name="title_activity_friends_list">Prijatelji</string>
     <string name="title_activity_planina">PlaninaActivity</string>
     <string name="title_activity_quests">Kvizovi</string>
+    <string name="title_activity_ranking">RankingActivity</string>
 </resources>

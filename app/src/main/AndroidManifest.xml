@@ -106,6 +106,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="rs.elfak.mosis.planinarijumx.MyProfileActivity" />
         </activity>
+        <activity
+            android:name=".RankingActivity"
+            android:label="@string/title_activity_ranking"
+            android:parentActivityName=".MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="rs.elfak.mosis.planinarijumx.MainActivity" />
+        </activity>
     </application>
 
 </manifest>
