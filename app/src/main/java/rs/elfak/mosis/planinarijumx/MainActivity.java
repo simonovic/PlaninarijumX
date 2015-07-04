@@ -8,7 +8,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,10 +20,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -32,12 +33,9 @@ public class MainActivity extends Activity
 {
     SharedPreferences shPref;
     private static final String request = "5\n";
-    static LatLng myLocation = new LatLng(43.319425, 21.899487);
     private ArrayList<Planina> planine;
     private ArrayAdapter<String> planineAdapter;
     private String pl;
-    Handler handler;
-    Runnable runnable;
     public static LatLng MyLocation =  new LatLng(43.319425, 21.899487);
     LocationManager locationManager;
     LocationListener listener;
@@ -50,16 +48,6 @@ public class MainActivity extends Activity
         setContentView(R.layout.activity_main);
 
         shPref = getSharedPreferences(Constants.loginpref, Context.MODE_PRIVATE);
-
-        /*handler = new Handler();
-        runnable = new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(getApplicationContext(),"Posalji serveru lokaciju", Toast.LENGTH_SHORT).show();
-                handler.postDelayed(runnable, 13000);
-            }
-        };
-        handler.postDelayed(runnable, 13000);*/;
 
         if (savedInstanceState == null)
         {
@@ -135,12 +123,35 @@ public class MainActivity extends Activity
             listener = new LocationListener() {
                 @Override
                 public void onLocationChanged(Location location) {
-                    myLocation = new LatLng(location.getLatitude(), location.getLongitude());
-                    Toast.makeText(getApplicationContext(), "Posalji serveru lokaciju", Toast.LENGTH_SHORT).show();
+                    MyLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try
+                            {
+                                OsobaMesto osobaMesto = new OsobaMesto(LogActivity.userID,MyLocation.latitude,MyLocation.longitude);
+                                String sendBuff = "10\n" + osobaMesto.toString() + "\n";
+                                InetAddress adr = InetAddress.getByName(Constants.address);
+                                Socket socket = new Socket(adr, Constants.PORT);
+                                PrintWriter printWriter = new PrintWriter(socket.getOutputStream(),true);
+                                printWriter.write(sendBuff);
+                                printWriter.flush();
+                                printWriter.close();
+                                socket.close();
+                                //osobaMesto = null;
 
-                    //TODO: Posalji serveru lokaciju
+                            } catch (UnknownHostException e) {
+                                e.printStackTrace();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            catch(Exception e)
+                            {
+                                e.printStackTrace();
+                            }
 
-                }
+                        }
+                    }).start();
 
                 @Override
                 public void onStatusChanged(String s, int i, Bundle bundle) {
@@ -158,8 +169,8 @@ public class MainActivity extends Activity
                 }
             };
 
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 2000, 0, listener);
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 0, listener);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, Constants.perioda, 0, listener);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, Constants.perioda, 0, listener);
         }
     }
 
@@ -201,7 +212,7 @@ public class MainActivity extends Activity
                 startActivity(inn);
                 break;
             case R.id.logout:
-                disconnect();
+               // disconnect();
                 SharedPreferences.Editor editor = shPref.edit();
                 editor.putInt(Constants.userIDpref, 0);
                 editor.commit();
