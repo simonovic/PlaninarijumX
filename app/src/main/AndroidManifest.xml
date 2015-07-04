@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <uses-permission android:name="android.permission.CALL_PHONE"/>
 
     <permission
         android:name="rs.elfak.mosis.planinarijumx.permission.MAPS_RECEIVE"
@@ -50,6 +51,7 @@
             android:label="@string/title_activity_main" >
         </activity>
         <activity
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:name=".MapActivity"
             android:label="@string/title_activity_map"
             android:parentActivityName=".MainActivity"
@@ -64,7 +66,7 @@
             android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyBsF30Ss4_PlUiHnu8ckHorqzwNSZsZBPY" />
+            android:value="AIzaSyAXAsCI2AvXk2lyR8j76PJhcaVJAbedg-E" />
 
         <activity
             android:name=".BluetoothActivity"

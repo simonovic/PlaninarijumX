@@ -5,7 +5,9 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Color;
+import android.location.Location;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -43,6 +45,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Random;
 
 
@@ -89,6 +92,7 @@ public class MapActivity extends ActionBarActivity
         if(map != null)
             map.setMyLocationEnabled(true);
 
+
         Intent i = getIntent();
         planinaID = i.getIntExtra("planinaID",-3);
         if(planinaID != -3)
@@ -107,8 +111,8 @@ public class MapActivity extends ActionBarActivity
             fakeQuest.clear();
         }
         fakeQuest = new ArrayList<Place>();
-        double lat = MainActivity.myLocation.latitude;
-        double lng = MainActivity.myLocation.longitude;
+        double lat = MainActivity.MyLocation.latitude;
+        double lng = MainActivity.MyLocation.longitude;
 
         Random r = new Random();
         int broj = r.nextInt(10);
@@ -134,7 +138,8 @@ public class MapActivity extends ActionBarActivity
 
     public void onSectionAttached(final int number) {
         invalidateOptionsMenu();
-        map.clear();
+        if(map != null)
+            map.clear();
         switch (number) {
             case 1:
                 mTitle = getString(R.string.title_section1);
@@ -152,7 +157,7 @@ public class MapActivity extends ActionBarActivity
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         Toast.makeText(getApplicationContext(), "Idi do servera" + picker.getValue() , Toast.LENGTH_SHORT).show();
-                        CircleOptions circleOptions = new CircleOptions().center(MainActivity.myLocation).
+                        CircleOptions circleOptions = new CircleOptions().center(MainActivity.MyLocation).
                                 radius(picker.getValue()).fillColor(0x4033B5E5).strokeColor(0x00000000);//51 181 229
                         map.addCircle(circleOptions);
                     }
@@ -197,42 +202,41 @@ public class MapActivity extends ActionBarActivity
                 alertDia.setCanceledOnTouchOutside(false);
                 alertDia.show();
                 quest = new ArrayList<Place>();
-                map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
-                    @Override
-                    public void onMapLongClick(final LatLng latLng) {
-                        if(mNavigationDrawerFragment.getmCurrentSelectedPosition() == 3)
-                        {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this,AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
-                            LayoutInflater inflater = MapActivity.this.getLayoutInflater();
-                            final View view = inflater.inflate(R.layout.place_layout,null);
-                            builder.setView(view)
-                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                            EditText editText = (EditText) view.findViewById(R.id.add_question);
-                                            String q = editText.getText().toString();
+                if(map != null)
+                    map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+                        @Override
+                        public void onMapLongClick(final LatLng latLng) {
+                            if (mNavigationDrawerFragment.getmCurrentSelectedPosition() == 3) {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+                                LayoutInflater inflater = MapActivity.this.getLayoutInflater();
+                                final View view = inflater.inflate(R.layout.place_layout, null);
+                                builder.setView(view)
+                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                EditText editText = (EditText) view.findViewById(R.id.add_question);
+                                                String q = editText.getText().toString();
 
-                                            editText = (EditText) view.findViewById(R.id.add_answer);
-                                            String a = editText.getText().toString();
+                                                editText = (EditText) view.findViewById(R.id.add_answer);
+                                                String a = editText.getText().toString();
 
+                                                Place place = new Place(latLng.latitude, latLng.longitude, a, q);
+                                                quest.add(place);
+                                                map.addMarker(new MarkerOptions().position(latLng).title(q));
+                                            }
+                                        })
+                                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                Toast.makeText(getApplicationContext(), "Odustao si", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                AlertDialog alertDialog = builder.create();
+                                alertDialog.show();
 
-                                            Place place = new Place(latLng.latitude,latLng.longitude,a,q);
-                                            quest.add(place);
-                                            map.addMarker(new MarkerOptions().position(latLng).title(q));
-                                        }
-                                    })
-                                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
-                                            Toast.makeText(getApplicationContext(), "Odustao si", Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-                            AlertDialog alertDialog = builder.create();
-                            alertDialog.show();
-
+                            }
                         }
-                    }
-                });
+                    });
                 break;
             case 5:
                 mTitle = getString(R.string.title_section5);
@@ -242,7 +246,7 @@ public class MapActivity extends ActionBarActivity
                     Toast.makeText(getApplicationContext(), "Cestitam, resio si.", Toast.LENGTH_SHORT)
                             .show();
                 map.addMarker(new MarkerOptions().
-                        position(new LatLng(pitanje.getLat(),pitanje.getLng()))
+                        position(new LatLng(pitanje.getLat(), pitanje.getLng()))
                         .title(pitanje.getPitanje()));
                 Toast.makeText(getApplicationContext(), "Odgovor:"+pitanje.getOdgovor(), Toast.LENGTH_SHORT).show();
                 map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
@@ -371,7 +375,8 @@ public class MapActivity extends ActionBarActivity
                                 quest.clear();
                                 quest = null;
                                 Place.ID = 0;
-                                map.clear();
+                                if(map != null)
+                                    map.clear();
                                 if(planinaID != -3)
                                     finish();
                                 else
