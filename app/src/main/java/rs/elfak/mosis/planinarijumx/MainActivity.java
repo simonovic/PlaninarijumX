@@ -153,6 +153,9 @@ public class MainActivity extends Activity
                         }
                     }).start();
 
+
+                }
+
                 @Override
                 public void onStatusChanged(String s, int i, Bundle bundle) {
 
