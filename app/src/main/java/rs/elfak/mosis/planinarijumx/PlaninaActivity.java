@@ -1,19 +1,30 @@
 package rs.elfak.mosis.planinarijumx;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
 
 public class PlaninaActivity extends Activity
 {
-    String plString;
-    Planina pl;
+    private String plString;
+    private Planina pl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -26,6 +37,27 @@ public class PlaninaActivity extends Activity
         Gson gson = new GsonBuilder().serializeNulls().create();
         pl = gson.fromJson(plString, Planina.class);
 
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                        String request = "9\n"+pl.getId()+"\n";
+                        InetAddress adr = InetAddress.getByName(Constants.address);
+                        Socket socket = new Socket(adr, Constants.PORT);
+                        PrintWriter printWriter = new PrintWriter(socket.getOutputStream(),true);
+                        printWriter.write(request);
+                        printWriter.flush();
+
+                        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                        String serverResponse = in.readLine();
+
+                        printWriter.close();
+                        socket.close();
+
+                }
+                catch (IOException e) { e.printStackTrace(); }
+                }
+            }).start();
     }
 
     @Override

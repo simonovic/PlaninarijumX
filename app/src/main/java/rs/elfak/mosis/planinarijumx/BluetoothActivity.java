@@ -14,6 +14,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Message;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -282,6 +284,11 @@ public class BluetoothActivity extends Activity
                     else if (tmp[0].equals("Success"))
                     {
                         friendsIDs.add(tmp[1]);
+                        Toast.makeText(BluetoothActivity.this, "Postali ste prijatelji!", Toast.LENGTH_LONG).show();
+                    }
+                    else if (tmp[0].equals("Failed"))
+                    {
+                        Toast.makeText(BluetoothActivity.this, "Spijateljavanje sa " + tmp[1] + " nije uspelo!", Toast.LENGTH_LONG).show();
                     }
                     break;
                 case 5:
@@ -314,10 +321,10 @@ public class BluetoothActivity extends Activity
                     public void run() {
                         try {
 
-                            /*String request = "7\n"+userID+"\n"+responseID+"\n";
+                            String request = "8\n" + userID + "\n" + responseID + "\n";
                             InetAddress adr = InetAddress.getByName(Constants.address);
                             Socket socket = new Socket(adr, Constants.PORT);
-                            PrintWriter printWriter = new PrintWriter(socket.getOutputStream(),true);
+                            PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
                             printWriter.write(request);
                             printWriter.flush();
 
@@ -325,20 +332,21 @@ public class BluetoothActivity extends Activity
                             String serverResponse = in.readLine();
 
                             printWriter.close();
-                            socket.close();*/
+                            socket.close();
 
-                            String serverResponse = "true";
-                            if (serverResponse.equals("false"))
-                            {
+                            if (serverResponse.equals("false")) {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-
+                                        Toast.makeText(getApplicationContext(), "Greška prilikom sprijateljavanja, pokušajte ponovo!", Toast.LENGTH_LONG).show();
+                                        String m = "Failed " + deviceName;
+                                        byte[] m1 = m.getBytes();
+                                        mService.write(m1);
+                                        mService.start();
                                     }
                                 });
-                            }
-                            else
-                            {
+                            } else {
+                                Toast.makeText(getApplicationContext(), "Postali ste prijatelji!", Toast.LENGTH_LONG).show();
                                 friendsIDs.add(responseID);
                                 String m = "Success " + userID;
                                 byte[] m1 = m.getBytes();
@@ -361,10 +369,6 @@ public class BluetoothActivity extends Activity
     {
         if(mBtAdapter.isEnabled())
         {
-            //mService.start();
-
-            ensureDiscoverable();
-
             progressD.setTitle("Bluetooth");
             progressD.setMessage("Detektovanje u toku...");
             progressD.show();
@@ -380,17 +384,8 @@ public class BluetoothActivity extends Activity
             mBtAdapter.startDiscovery();
         }
         else
-            Toast.makeText(getApplicationContext(), "Morate prvo uključiti Bluetooth!", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Morate uključiti Bluetooth!", Toast.LENGTH_LONG).show();
 
-    }
-
-    private void ensureDiscoverable()
-    {
-        if (mBtAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
-            Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-            discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 360);
-            startActivity(discoverableIntent);
-        }
     }
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver()
@@ -408,7 +403,6 @@ public class BluetoothActivity extends Activity
                 progressD.dismiss();
                 if (mNewDevicesArrayAdapter.getCount() == 0)
                     Toast.makeText(BluetoothActivity.this, "Nijedan uređaj nije pronađen!", Toast.LENGTH_LONG).show();
-                    //mNewDevicesArrayAdapter.add("Nijedan uređaj nije pronađen" + "\n" + "Pokušajte ponovo");
                 detDevices.setVisibility(View.VISIBLE);
                 detectBtn.setClickable(true);
             }
@@ -442,4 +436,27 @@ public class BluetoothActivity extends Activity
             dialog.show();
         }
     };
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_bluetooth, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId())
+        {
+            case R.id.discoverable:
+                if (mBtAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
+                    Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+                    discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 360);
+                    startActivity(discoverableIntent);
+                }
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 }

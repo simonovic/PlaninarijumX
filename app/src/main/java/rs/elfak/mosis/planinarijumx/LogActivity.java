@@ -28,7 +28,11 @@ public class LogActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_log);
         shPref = getSharedPreferences(Constants.loginpref, Context.MODE_PRIVATE);
-        userID = shPref.getInt(Constants.userIDpref, 0);
+        //userID = shPref.getInt(Constants.userIDpref, 0);
+        userID = 4;
+        SharedPreferences.Editor editor = shPref.edit();
+        editor.putInt(Constants.userIDpref, userID);
+        editor.commit();
         if (userID != 0)
         {
             Intent i = new Intent(this, MainActivity.class);
