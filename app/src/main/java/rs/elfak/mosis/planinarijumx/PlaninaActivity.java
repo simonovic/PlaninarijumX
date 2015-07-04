@@ -68,6 +68,7 @@ public class PlaninaActivity extends Activity
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            setTitle(pl.getIme());
                             questAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1);
                             for (Iterator<Quest> i = questList.iterator(); i.hasNext(); ) {
                                 Quest q = i.next();

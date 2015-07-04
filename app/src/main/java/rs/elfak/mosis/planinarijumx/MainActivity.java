@@ -210,6 +210,7 @@ public class MainActivity extends Activity
                 break;
             case R.id.rank:
                 Intent innn = new Intent(this, RankingActivity.class);
+
                 startActivity(innn);
                 break;
         }
