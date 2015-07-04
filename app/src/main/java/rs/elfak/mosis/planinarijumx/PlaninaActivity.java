@@ -1,9 +1,7 @@
 package rs.elfak.mosis.planinarijumx;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,8 +9,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -26,12 +22,12 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map;
 
 
 public class PlaninaActivity extends Activity
 {
-    private String plString;
-    private Planina pl;
+    private static Planina pl;
     private ArrayList<Quest> questList;
     private ArrayAdapter<String> questAdapter;
 
@@ -42,7 +38,7 @@ public class PlaninaActivity extends Activity
         setContentView(R.layout.activity_planina);
 
         Bundle extras = getIntent().getExtras();
-        plString = extras.getString("planina");
+        String plString = extras.getString("planina");
         Gson gson = new GsonBuilder().serializeNulls().create();
         pl = gson.fromJson(plString, Planina.class);
 
@@ -113,11 +109,43 @@ public class PlaninaActivity extends Activity
         public void onItemClick(AdapterView<?> parent, View view, int position, long id)
         {
             Gson gson = new GsonBuilder().serializeNulls().create();
-            Quest q = questList.get(position);
-            String plString = gson.toJson(q);
-            Intent i = new Intent(PlaninaActivity.this, PlaninaActivity.class);
-            i.putExtra("quest", plString);
-            startActivity(i);
+            final Quest q = questList.get(position);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        String sendBuff = "11\n" + LogActivity.userID + "\n" + q.getId() + "\n";
+                        InetAddress adr = InetAddress.getByName(Constants.address);
+                        Socket socket = new Socket(adr, Constants.PORT);
+                        PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
+                        printWriter.write(sendBuff);
+                        printWriter.flush();
+                        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                        final String info = in.readLine();
+                        final int pozicija = Integer.parseInt(in.readLine());
+                        in.close();
+                        printWriter.close();
+                        socket.close();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Intent i = new Intent(getApplication(), MapActivity.class);
+                                String podaci = q.getIme() + "\n" + q.getId() + "\n" + pozicija + "\n" + info;
+                                i.putExtra("questInfo",podaci);
+                                startActivity(i);
+                            }
+                        });
+
+                    } catch (UnknownHostException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch(Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+
         }
     };
 }

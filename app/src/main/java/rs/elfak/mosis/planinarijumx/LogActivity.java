@@ -92,8 +92,14 @@ public class LogActivity extends Activity
                             editor.commit();
                             userID = shPref.getInt(Constants.userIDpref, 0);
                             Intent i = new Intent(LogActivity.this, MainActivity.class);
-                            ime.setText("");
-                            loz.setText("");
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ime.setText("");
+                                    loz.setText("");
+                                }
+                            });
+
                             startActivity(i);
                         }
                     }

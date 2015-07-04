@@ -36,6 +36,9 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -63,9 +66,10 @@ public class MapActivity extends ActionBarActivity
     private CharSequence mTitle;
     private GoogleMap map;
     private ArrayList<Place> quest;
-    private String questName;
+    private String questName = "";
     private ArrayList<Place> fakeQuest;
     private int planinaID;
+    private QuestSolver questSolver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,9 +103,46 @@ public class MapActivity extends ActionBarActivity
         {
             mNavigationDrawerFragment.setMenuVisibility(false);
             mNavigationDrawerFragment.selectItem(3);
-            //preimenujMe = true;
+            return;
         }
 
+        String kvizovi = i.getStringExtra("questInfo");
+        if(kvizovi != null)
+        {
+            String [] linije = kvizovi.split("\n");
+            questName = linije[0];
+            int questID = Integer.parseInt(linije[1]);
+            int pozicija = Integer.parseInt(linije[2]);
+            Gson gson = new GsonBuilder().serializeNulls().create();
+            ArrayList<NovoMesto> mestaUKvizu = gson.fromJson(linije[3], new TypeToken<ArrayList<NovoMesto>>() {}.getType());
+            quest = new ArrayList<Place>();
+            Place.ID = 0;
+            for(int j = 0; j < mestaUKvizu.size(); j++)
+            {
+                NovoMesto novoMesto = mestaUKvizu.get(j);
+                Place p = new Place(novoMesto.getLat(),novoMesto.getLon(),novoMesto.getOdgovor(),novoMesto.getPitanje());
+                quest.add(p);
+            }
+            questSolver = new QuestSolver(quest,questID);
+            if(pozicija != -1)
+            {
+                questSolver.setPosition(quest.size()  - pozicija);
+            }
+            mNavigationDrawerFragment.setMenuVisibility(false);
+            mNavigationDrawerFragment.selectItem(4);
+            return;
+
+        }
+
+    }
+
+    private void prikaziQuest()
+    {
+        for(int i = 0 ; i < quest.size(); i++)
+        {
+            LatLng latLng = new LatLng(quest.get(i).getLat(),quest.get(i).getLng());
+            map.addMarker(new MarkerOptions().position(latLng).title((quest.get(i).getId() + 1) + ". " + getString(R.string.question)));
+        }
     }
 
     private void popuniQuest()
@@ -173,7 +214,44 @@ public class MapActivity extends ActionBarActivity
                 break;
             case 3:
                 mTitle = getString(R.string.title_section3);
-                popuniQuest();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        try {
+                            String sendBuff = "12\n" + LogActivity.userID + "\n";
+                            InetAddress adr = InetAddress.getByName(Constants.address);
+                            Socket socket = new Socket(adr, Constants.PORT);
+                            PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
+                            printWriter.write(sendBuff);
+                            printWriter.flush();
+
+                            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                            String info = in.readLine();
+                            Gson gson = new GsonBuilder().serializeNulls().create();
+                            final ArrayList<OnlinePrijatelj> onlinePrijatelji = gson.fromJson(info, new TypeToken<ArrayList<OnlinePrijatelj>>() {}.getType());
+
+                            in.close();
+                            printWriter.close();
+                            socket.close();
+
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    for(int i = 0 ; i < onlinePrijatelji.size(); i++)
+                                    {
+                                        LatLng latLng = new LatLng(onlinePrijatelji.get(i).getLat(),onlinePrijatelji.get(i).getLon());
+                                        map.addMarker(new MarkerOptions().position(latLng).title((onlinePrijatelji.get(i).getUser())));
+                                    }
+                                }
+                            });
+                        } catch (UnknownHostException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
                 break;
             case 4:
                 mTitle = getString(R.string.title_section4);
@@ -239,9 +317,10 @@ public class MapActivity extends ActionBarActivity
                     });
                 break;
             case 5:
-                mTitle = getString(R.string.title_section5);
-                final QuestSolver questSolver = new QuestSolver(fakeQuest);
-                Place pitanje = questSolver.getPitanje();
+                mTitle = getString(R.string.title_section5) + " : " + questName;
+                if(questSolver.getPosition() + 1 == questSolver.getQuest().size())
+                    prikaziQuest();
+                /*Place pitanje = questSolver.getPitanje();
                 if(pitanje == null)
                     Toast.makeText(getApplicationContext(), "Cestitam, resio si.", Toast.LENGTH_SHORT)
                             .show();
@@ -289,7 +368,7 @@ public class MapActivity extends ActionBarActivity
 
                         return true;
                     }
-                });
+                });*/
                 break;
         }
     }

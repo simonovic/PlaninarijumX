@@ -39,9 +39,9 @@ public class QuestsActivity extends Activity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_quests);
         try {
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_quests);
 
             adapter = new QuestListAdapter(this, name, status);
             questList = (ListView) findViewById(R.id.list);

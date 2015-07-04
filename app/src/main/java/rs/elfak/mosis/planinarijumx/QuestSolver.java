@@ -9,10 +9,14 @@ public class QuestSolver
 {
     ArrayList<Place> quest;
     int position;
+    int questID;
+    boolean zapocet;
 
-    public QuestSolver(ArrayList<Place> quest) {
+    public QuestSolver(ArrayList<Place> quest,int id) {
         this.quest = quest;
         position = quest.size() - 1;
+        questID = id;
+        zapocet = false;
     }
 
     public boolean Solve(String odg)
@@ -41,5 +45,18 @@ public class QuestSolver
                 return quest.get(i);
 
         return null;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
+        zapocet = true;
+    }
+
+    public ArrayList<Place> getQuest() {
+        return quest;
     }
 }
