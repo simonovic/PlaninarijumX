@@ -109,6 +109,12 @@ public class MyProfileActivity extends Activity
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        LogActivity.trenutnaAktivnost = this;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 

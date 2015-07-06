@@ -577,21 +577,32 @@ public class MapActivity extends ActionBarActivity
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LogActivity.trenutnaAktivnost = this;
+    }
+
     private void pitajPrijatelja(final OnlinePrijatelj onlinePrijatelj,final Marker marker)
     {
+        final String pitanje;
+        final double lat,lon;
+        pitanje = marker.getTitle();
+        lat = marker.getPosition().latitude;
+        lon = marker.getPosition().longitude;
         new Thread(new Runnable() {
             @Override
             public void run() {
                 String adresa = onlinePrijatelj.getIp().substring(1);
                 StringTokenizer tokeni = new StringTokenizer(adresa, ":");
                 adresa = tokeni.nextToken();
-                String sendBuf = marker.getTitle() + "\n" +
-                        marker.getPosition().latitude + "\n" + marker.getPosition().longitude + "\n";
+                String sendBuf = pitanje + "\n" +
+                        lat + "\n" + lon + "\n";
 
                 try {
                     InetAddress adr = InetAddress.getByName(adresa);
 
-                    Socket socket = new Socket(adr, Constants.PORT);
+                    Socket socket = new Socket(adr, Constants.FRIENDPORT);
                     PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
                     printWriter.write(sendBuf);
                     printWriter.flush();
@@ -601,12 +612,15 @@ public class MapActivity extends ActionBarActivity
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+                            AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this);
                             LayoutInflater inflater = MapActivity.this.getLayoutInflater();
                             final View view = inflater.inflate(R.layout.place_layout, null);
                             ((EditText) view.findViewById(R.id.add_question)).setText(marker.getTitle());
                             ((EditText) view.findViewById(R.id.add_question)).setKeyListener(null);
+                            ((EditText) view.findViewById(R.id.add_answer)).setText(odgovor);
                             ((EditText) view.findViewById(R.id.add_answer)).setKeyListener(null);
+
+                            builder.setView(view);
 
                             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 @Override

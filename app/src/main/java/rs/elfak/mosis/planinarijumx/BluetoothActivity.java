@@ -135,6 +135,7 @@ public class BluetoothActivity extends Activity
         if (mService != null)
             if(mService.getState() == BluetoothService.STATE_NONE)
                 mService.start();
+        LogActivity.trenutnaAktivnost = this;
     }
 
     @Override

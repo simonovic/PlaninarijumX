@@ -11,16 +11,23 @@ public class QuestSolver
     int position;
     int questID;
     boolean zapocet;
+    private int poeni;
+
 
     public QuestSolver(ArrayList<Place> quest,int id) {
         this.quest = quest;
         position = quest.size() - 1;
         questID = id;
         zapocet = false;
+        poeni = 0;
     }
 
     public boolean Solve(String odg)
     {
+        if(odg == null)
+            return false;
+        if(odg.equals(""))
+            return false;
         System.out.println("uneo si"+odg);
 
         for(int i = 0; i < quest.size(); i++)
@@ -58,5 +65,26 @@ public class QuestSolver
 
     public ArrayList<Place> getQuest() {
         return quest;
+    }
+
+    public boolean isZapocet() {
+        return zapocet;
+    }
+
+    public void setZapocet(boolean zapocet) {
+        this.zapocet = zapocet;
+    }
+
+    public int getPoeni() {
+        return poeni;
+    }
+
+    public void setPoeni(int poeni) {
+        this.poeni = poeni;
+    }
+
+    public void addPoeni(int amount)
+    {
+        poeni += amount;
     }
 }

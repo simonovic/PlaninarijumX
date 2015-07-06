@@ -12,12 +12,14 @@ public class OnlinePrijatelj
     private String user;
     private double lat;
     private double lon;
+    private String ip;
 
-    public OnlinePrijatelj(int id, double lat, double lon, String user) {
+    public OnlinePrijatelj(int id, double lat, double lon, String user, String IP) {
         this.id = id;
         this.lat = lat;
         this.lon = lon;
         this.user = user;
+        this.ip = IP;
     }
 
     private OnlinePrijatelj(){}
@@ -66,5 +68,13 @@ public class OnlinePrijatelj
         Gson gson = gsonBuilder.create();
         s = gson.toJson(this);
         return s;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
     }
 }

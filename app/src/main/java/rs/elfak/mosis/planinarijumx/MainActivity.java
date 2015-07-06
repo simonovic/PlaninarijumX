@@ -1,18 +1,24 @@
 package rs.elfak.mosis.planinarijumx;
 
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 import com.google.android.gms.maps.model.LatLng;
@@ -24,10 +30,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class MainActivity extends Activity
 {
@@ -40,6 +48,9 @@ public class MainActivity extends Activity
     LocationManager locationManager;
     LocationListener listener;
     private final String STATE_PLANINE = "planine";
+    private Thread nitZaPitanja;
+    ServerSocket serverSocket;
+    Socket socket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -108,6 +119,8 @@ public class MainActivity extends Activity
             plListView.setAdapter(planineAdapter);
             plListView.setOnItemClickListener(planinaClickListener);
         }
+
+        startListening();
     }
 
     @Override
@@ -115,6 +128,85 @@ public class MainActivity extends Activity
     {
         savedInstanceState.putString(STATE_PLANINE, pl);
         super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LogActivity.trenutnaAktivnost = this;
+    }
+
+    private void startListening()
+    {
+        nitZaPitanja = new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                try {
+                    serverSocket = new ServerSocket(Constants.FRIENDPORT);
+
+                    socket = serverSocket.accept();
+                    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    final String pitanje = in.readLine();
+                    final double lat = Double.parseDouble(in.readLine());
+                    final double lon = Double.parseDouble(in.readLine());
+
+                    if(pitanje != null)
+                    {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(LogActivity.trenutnaAktivnost);
+                                LayoutInflater inflater = LogActivity.trenutnaAktivnost.getLayoutInflater();
+                                final View view = inflater.inflate(R.layout.place_layout, null);
+                                ((EditText) view.findViewById(R.id.add_question)).setText(pitanje);
+                                ((EditText) view.findViewById(R.id.add_question)).postInvalidate();
+                                final EditText odgovor = (EditText) view.findViewById(R.id.add_answer);
+                                ((EditText) view.findViewById(R.id.add_question)).setKeyListener(null);
+                                builder.setView(view);
+                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        vratiOdgovor(odgovor.getText().toString());
+                                    }
+                                });
+
+                                AlertDialog alertDialog = builder.create();
+                                alertDialog.setCanceledOnTouchOutside(true);
+                                alertDialog.show();
+
+                            }
+                        });
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        nitZaPitanja.start();
+    }
+
+    private void vratiOdgovor(final String odgovor)
+    {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
+                    printWriter.write(odgovor);
+                    printWriter.flush();
+                    printWriter.close();
+                    socket.close();
+                    serverSocket.close();
+                    startListening();
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }).start();
     }
 
     @Override
@@ -181,9 +273,29 @@ public class MainActivity extends Activity
 
     private void disconnect()
     {
-        locationManager.removeUpdates(listener);
-        locationManager = null;
-        listener = null;
+        if(nitZaPitanja != null)
+        {
+
+            try {
+                if(socket != null)
+                    if(!socket.isClosed())
+                        socket.close();
+                if(serverSocket != null)
+                    if(!serverSocket.isClosed())
+                        serverSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            if(nitZaPitanja.isAlive())
+                nitZaPitanja.interrupt();
+
+        }
+        if(locationManager != null) {
+            locationManager.removeUpdates(listener);
+            locationManager = null;
+            listener = null;
+        }
     }
 
     @Override
@@ -221,8 +333,7 @@ public class MainActivity extends Activity
                 SharedPreferences.Editor editor = shPref.edit();
                 editor.putInt(Constants.userIDpref, 0);
                 editor.commit();
-                Intent ii = new Intent(this, LogActivity.class);
-                startActivity(ii);
+                finish();
                 break;
             case R.id.rank:
                 Intent innn = new Intent(this, RankingActivity.class);

@@ -89,6 +89,12 @@ public class PlaninaActivity extends Activity
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        LogActivity.trenutnaAktivnost = this;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
@@ -104,6 +110,8 @@ public class PlaninaActivity extends Activity
         }
         return super.onOptionsItemSelected(item);
     }
+
+
 
     private AdapterView.OnItemClickListener questClickListener = new AdapterView.OnItemClickListener() {
         @Override

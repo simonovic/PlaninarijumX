@@ -21,11 +21,13 @@ public class LogActivity extends Activity
 {
     SharedPreferences shPref;
     static int userID;
+    static Activity trenutnaAktivnost;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_log);
         shPref = getSharedPreferences(Constants.loginpref, Context.MODE_PRIVATE);
         userID = shPref.getInt(Constants.userIDpref, 0);
@@ -38,6 +40,14 @@ public class LogActivity extends Activity
             i.putExtra("userID", userID);
             startActivity(i);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        trenutnaAktivnost = this;
+        EditText loz = (EditText)findViewById(R.id.lozinka);
+        loz.setText("");
     }
 
     public void onPrijavaBtn(View view)
@@ -92,13 +102,6 @@ public class LogActivity extends Activity
                             editor.commit();
                             userID = shPref.getInt(Constants.userIDpref, 0);
                             Intent i = new Intent(LogActivity.this, MainActivity.class);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    ime.setText("");
-                                    loz.setText("");
-                                }
-                            });
 
                             startActivity(i);
                         }

@@ -98,4 +98,10 @@ public class QuestsActivity extends Activity
         }).start();
 
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LogActivity.trenutnaAktivnost = this;
+    }
 }

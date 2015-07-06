@@ -121,6 +121,12 @@ public class RankingActivity extends Activity
         }).start();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LogActivity.trenutnaAktivnost = this;
+    }
+
     private AdapterView.OnItemClickListener osobaClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id)

@@ -10,15 +10,17 @@ public class Place {
     private String odgovor;
     private double lat;
     private double lng;
+    private int pitanjeID;
 
 
-    public Place(double lat, double lng, String odgovor, String pitanje)
+    public Place(double lat, double lng, String odgovor, String pitanje,int pitanjeID)
     {
         id = ID;
         this.lat = lat;
         this.lng = lng;
         this.odgovor = odgovor;
         this.pitanje = pitanje;
+        this.pitanjeID = pitanjeID;
         ID++;
     }
 
@@ -40,5 +42,13 @@ public class Place {
 
     public String getPitanje() {
         return pitanje;
+    }
+
+    public int getPitanjeID() {
+        return pitanjeID;
+    }
+
+    public void setPitanjeID(int pitanjeID) {
+        this.pitanjeID = pitanjeID;
     }
 }
