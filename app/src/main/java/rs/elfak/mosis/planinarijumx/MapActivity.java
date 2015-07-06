@@ -25,7 +25,9 @@ import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.NumberPicker;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,12 +46,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.lang.reflect.Array;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
+import java.util.StringTokenizer;
 
 
 public class MapActivity extends ActionBarActivity
@@ -69,7 +73,7 @@ public class MapActivity extends ActionBarActivity
     private String questName = "";
     private ArrayList<Place> fakeQuest;
     private int planinaID;
-    private QuestSolver questSolver;
+    private QuestSolver questSolver = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,7 +124,7 @@ public class MapActivity extends ActionBarActivity
             for(int j = 0; j < mestaUKvizu.size(); j++)
             {
                 NovoMesto novoMesto = mestaUKvizu.get(j);
-                Place p = new Place(novoMesto.getLat(),novoMesto.getLon(),novoMesto.getOdgovor(),novoMesto.getPitanje());
+                Place p = new Place(novoMesto.getLat(),novoMesto.getLon(),novoMesto.getOdgovor(),novoMesto.getPitanje(),novoMesto.getId());
                 quest.add(p);
             }
             questSolver = new QuestSolver(quest,questID);
@@ -145,27 +149,36 @@ public class MapActivity extends ActionBarActivity
         }
     }
 
-    private void popuniQuest()
+    public static ArrayList<OnlinePrijatelj> getPrijatelji()
     {
-        if(fakeQuest != null)
-        {
-            fakeQuest.clear();
-        }
-        fakeQuest = new ArrayList<Place>();
-        double lat = MainActivity.MyLocation.latitude;
-        double lng = MainActivity.MyLocation.longitude;
+        ArrayList<OnlinePrijatelj> onlinePrijatelji = null;
 
-        Random r = new Random();
-        int broj = r.nextInt(10);
-        for (int i = 0; i < 2; i++)
-        {
-            double faktor = r.nextDouble();
-            faktor = faktor - 0.5;
-            faktor = faktor / 2.0;
-            Place p = new Place(lat + faktor, lng + faktor,"odg"+i,"pitanje"+i);
-            fakeQuest.add(p);
+        try {
+            String sendBuff = "12\n" + LogActivity.userID + "\n";
+            InetAddress adr = InetAddress.getByName(Constants.address);
+            Socket socket = new Socket(adr, Constants.PORT);
+            PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
+            printWriter.write(sendBuff);
+            printWriter.flush();
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            String info = in.readLine();
+            Gson gson = new GsonBuilder().serializeNulls().create();
+            onlinePrijatelji = gson.fromJson(info, new TypeToken<ArrayList<OnlinePrijatelj>>() {
+            }.getType());
+
+            in.close();
+            printWriter.close();
+            socket.close();
+
+
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        Place.ID = 0;
+
+        return onlinePrijatelji;
     }
 
     @Override
@@ -214,44 +227,25 @@ public class MapActivity extends ActionBarActivity
                 break;
             case 3:
                 mTitle = getString(R.string.title_section3);
+
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        final ArrayList<OnlinePrijatelj> onlinePrijatelji = MapActivity.getPrijatelji();
 
-                        try {
-                            String sendBuff = "12\n" + LogActivity.userID + "\n";
-                            InetAddress adr = InetAddress.getByName(Constants.address);
-                            Socket socket = new Socket(adr, Constants.PORT);
-                            PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
-                            printWriter.write(sendBuff);
-                            printWriter.flush();
-
-                            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                            String info = in.readLine();
-                            Gson gson = new GsonBuilder().serializeNulls().create();
-                            final ArrayList<OnlinePrijatelj> onlinePrijatelji = gson.fromJson(info, new TypeToken<ArrayList<OnlinePrijatelj>>() {}.getType());
-
-                            in.close();
-                            printWriter.close();
-                            socket.close();
-
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    for(int i = 0 ; i < onlinePrijatelji.size(); i++)
-                                    {
-                                        LatLng latLng = new LatLng(onlinePrijatelji.get(i).getLat(),onlinePrijatelji.get(i).getLon());
-                                        map.addMarker(new MarkerOptions().position(latLng).title((onlinePrijatelji.get(i).getUser())));
-                                    }
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                for(int i = 0 ; i < onlinePrijatelji.size(); i++)
+                                {
+                                    LatLng latLng = new LatLng(onlinePrijatelji.get(i).getLat(),onlinePrijatelji.get(i).getLon());
+                                    map.addMarker(new MarkerOptions().position(latLng).title((onlinePrijatelji.get(i).getUser())));
                                 }
-                            });
-                        } catch (UnknownHostException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                            }
+                        });
                     }
                 }).start();
+
                 break;
             case 4:
                 mTitle = getString(R.string.title_section4);
@@ -298,7 +292,7 @@ public class MapActivity extends ActionBarActivity
                                                 editText = (EditText) view.findViewById(R.id.add_answer);
                                                 String a = editText.getText().toString();
 
-                                                Place place = new Place(latLng.latitude, latLng.longitude, a, q);
+                                                Place place = new Place(latLng.latitude, latLng.longitude, a, q,-1);
                                                 quest.add(place);
                                                 map.addMarker(new MarkerOptions().position(latLng).title(q));
                                             }
@@ -390,7 +384,13 @@ public class MapActivity extends ActionBarActivity
             if(mNavigationDrawerFragment.getmCurrentSelectedPosition() == 3)
             {
                 getMenuInflater().inflate(R.menu.add_quest,menu);
-            }else
+            }else if((mNavigationDrawerFragment.getmCurrentSelectedPosition() == 4)
+                    && (questSolver != null)
+                    && (questSolver.getPosition() == questSolver.getQuest().size() - 1))
+            {
+                getMenuInflater().inflate(R.menu.kviz_menu,menu);
+            }
+            else
                 getMenuInflater().inflate(R.menu.map, menu);
             restoreActionBar();
             return true;
@@ -428,7 +428,7 @@ public class MapActivity extends ActionBarActivity
                         for(int i = 0; i < quest.size(); i++)
                         {
                             Place p = quest.get(i);
-                            NovoMesto novoMesto = new NovoMesto(p.getPitanje(),p.getOdgovor(),p.getLat(),p.getLng(),p.getId());
+                            NovoMesto novoMesto = new NovoMesto(-1,p.getPitanje(),p.getOdgovor(),p.getLat(),p.getLng(),p.getId());
                             sendBuf = novoMesto.toString() + "\n";
                             printWriter.write(sendBuf);
                         }
@@ -471,9 +471,179 @@ public class MapActivity extends ActionBarActivity
                 }
             }).start();
 
+        }else if(id == R.id.start_quest)
+        {
+            if(!questSolver.isZapocet()) {
+                map.clear();
+
+                questSolver.setZapocet(true);
+
+                Place pitanje = questSolver.getPitanje();
+                if (pitanje == null)
+                    Toast.makeText(getApplicationContext(), "Cestitam, resio si.", Toast.LENGTH_SHORT)
+                            .show();
+                map.addMarker(new MarkerOptions().
+                        position(new LatLng(pitanje.getLat(), pitanje.getLng()))
+                        .title(pitanje.getPitanje()));
+                Toast.makeText(getApplicationContext(), "Odgovor:" + pitanje.getOdgovor(), Toast.LENGTH_SHORT).show();
+                map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(final Marker marker) {
+                        final AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+                        LayoutInflater inflater = MapActivity.this.getLayoutInflater();
+                        final View view = inflater.inflate(R.layout.place_layout, null);
+                        ((EditText) view.findViewById(R.id.add_question)).setText(marker.getTitle());
+                        ((EditText) view.findViewById(R.id.add_question)).setKeyListener(null);
+                        builder.setView(view)
+                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        String odg = ((EditText) view.findViewById(R.id.add_answer)).getText().toString();
+                                        boolean b = questSolver.Solve(odg);
+                                        if (b == true) {
+                                            Place pit = questSolver.getPitanje();
+                                            if (pit == null) {
+                                                Toast.makeText(getApplicationContext(), "Cestitam, resio si.", Toast.LENGTH_SHORT)
+                                                        .show();
+                                            } else {
+                                                map.addMarker(new MarkerOptions().
+                                                        position(new LatLng(pit.getLat(), pit.getLng()))
+                                                        .title(pit.getPitanje()));
+                                            }
+                                        } else
+                                            Toast.makeText(getApplicationContext(), "Pogresio si", Toast.LENGTH_SHORT).show();
+
+                                    }
+                                })
+                                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        // Toast.makeText(getApplicationContext(), "Odustao si", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                        builder.setNeutralButton(getString(R.string.ask_friend), new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        final ArrayList<OnlinePrijatelj> onlinePrijatelji = MapActivity.getPrijatelji();
+
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+
+                                                if (onlinePrijatelji.size() == 0) {
+                                                    Toast.makeText(getApplicationContext(), "Nemas prijatelje online", Toast.LENGTH_SHORT).show();
+                                                    return;
+                                                } else {
+                                                    AlertDialog.Builder builder2 = new AlertDialog.Builder(MapActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+                                                    builder2.setTitle("Izaberi prijatelja");
+                                                    String [] imenaPrijatelja = new String [onlinePrijatelji.size()];
+                                                    for(int i = 0; i < onlinePrijatelji.size(); i++)
+                                                    {
+                                                        imenaPrijatelja[i] = onlinePrijatelji.get(i).getUser();
+                                                    }
+                                                    builder2.setItems(imenaPrijatelja, new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which)
+                                                        {
+                                                            Toast.makeText(getApplicationContext(),onlinePrijatelji.get(which).getUser(),
+                                                                    Toast.LENGTH_SHORT).show();
+                                                            pitajPrijatelja(onlinePrijatelji.get(which),marker);
+                                                        }
+                                                    });
+
+                                                    AlertDialog alertDialog = builder2.create();
+                                                    alertDialog.show();
+                                                }
+
+                                            }
+                                        });
+                                    }
+                                }).start();
+                            }
+                        });
+                        AlertDialog alertDialog = builder.create();
+                        alertDialog.show();
+
+                        return true;
+                    }
+                });
+
+            }
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void pitajPrijatelja(final OnlinePrijatelj onlinePrijatelj,final Marker marker)
+    {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String adresa = onlinePrijatelj.getIp().substring(1);
+                StringTokenizer tokeni = new StringTokenizer(adresa, ":");
+                adresa = tokeni.nextToken();
+                String sendBuf = marker.getTitle() + "\n" +
+                        marker.getPosition().latitude + "\n" + marker.getPosition().longitude + "\n";
+
+                try {
+                    InetAddress adr = InetAddress.getByName(adresa);
+
+                    Socket socket = new Socket(adr, Constants.PORT);
+                    PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
+                    printWriter.write(sendBuf);
+                    printWriter.flush();
+                    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    final String odgovor = in.readLine();
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+                            LayoutInflater inflater = MapActivity.this.getLayoutInflater();
+                            final View view = inflater.inflate(R.layout.place_layout, null);
+                            ((EditText) view.findViewById(R.id.add_question)).setText(marker.getTitle());
+                            ((EditText) view.findViewById(R.id.add_question)).setKeyListener(null);
+                            ((EditText) view.findViewById(R.id.add_answer)).setKeyListener(null);
+
+                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    boolean b = questSolver.Solve(odgovor);
+                                    if (b == true) {
+                                        Place pit = questSolver.getPitanje();
+                                        if (pit == null) {
+                                            Toast.makeText(getApplicationContext(), "Cestitam, resio si.", Toast.LENGTH_SHORT)
+                                                    .show();
+                                        } else {
+                                            map.addMarker(new MarkerOptions().
+                                                    position(new LatLng(pit.getLat(), pit.getLng()))
+                                                    .title(pit.getPitanje()));
+                                        }
+                                    } else
+                                        Toast.makeText(getApplicationContext(), "Pogresio si", Toast.LENGTH_SHORT).show();
+
+                                }
+                            });
+
+                            AlertDialog alertDialog = builder.create();
+                            alertDialog.setCanceledOnTouchOutside(false);
+                            alertDialog.show();
+                        }
+                    });
+
+                    in.close();
+                    printWriter.close();
+                    socket.close();
+                } catch (UnknownHostException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     /**
