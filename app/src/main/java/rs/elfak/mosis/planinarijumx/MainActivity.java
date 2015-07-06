@@ -73,10 +73,12 @@ public class MainActivity extends Activity
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                            int br = 1;
                             planineAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1);
                             for (Iterator<Planina> i = planine.iterator(); i.hasNext(); ) {
                                 Planina pl = i.next();
-                                planineAdapter.add(pl.getIme());
+                                planineAdapter.add(br+".  "+pl.getIme());
+                                br++;
                             }
                             ListView plListView = (ListView) findViewById(R.id.planinaListView);
                             plListView.setAdapter(planineAdapter);

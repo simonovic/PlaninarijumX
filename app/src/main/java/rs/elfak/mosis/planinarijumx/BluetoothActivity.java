@@ -67,6 +67,8 @@ public class BluetoothActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bluetooth);
 
+        setTitle("Dodaj prijatelja");
+
         if (savedInstanceState == null) {
             Bundle extras = getIntent().getExtras();
             friendsID = extras.getString("friendsID");

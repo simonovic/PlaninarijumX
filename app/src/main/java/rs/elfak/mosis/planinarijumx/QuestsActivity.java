@@ -19,6 +19,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 
 public class QuestsActivity extends Activity
@@ -27,13 +28,19 @@ public class QuestsActivity extends Activity
     QuestListAdapter adapter;
     private int userId;
     private String response;
-    private ArrayList<Quest> quests;
+    ArrayList<Quest> quests;
+    private List<String> nameList;
+    private List<String> nameStatus;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quests);
+
+        nameList = new ArrayList<String>();
+        nameStatus = new ArrayList<String>();
 
         Bundle extras = getIntent().getExtras();
         userId = extras.getInt("userID");
@@ -62,9 +69,16 @@ public class QuestsActivity extends Activity
                         @Override
                         public void run() {
 
-                            final String[] name = {};
-                            final String[] status = {};
-                            name[0] = "1";
+                            int br = 1;
+                            for (Iterator<Quest> i = quests.iterator(); i.hasNext(); ) {
+                                Quest q = i.next();
+                                nameList.add(br+".  "+q.getIme());
+                                nameStatus.add("");
+                                br++;
+                            }
+                            final String[] name = nameList.toArray(new String[nameList.size()]);
+                            final String[] status = nameStatus.toArray(new String[nameStatus.size()]);
+
                             adapter = new QuestListAdapter(QuestsActivity.this, name, status);
                             questList = (ListView) findViewById(R.id.list);
                             questList.setAdapter(adapter);

@@ -68,11 +68,14 @@ public class FriendsListActivity extends Activity
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+
+                            int br = 1;
                             friendsAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1);
                             for (Iterator<OsobaReduced> i = friends.iterator(); i.hasNext(); ) {
                                 OsobaReduced os = i.next();
-                                friendsAdapter.add(os.getUser());
+                                friendsAdapter.add(br+".  "+os.getUser());
                                 friendsID += os.getId()+" ";
+                                br++;
                             }
                             ListView friendsList = (ListView) findViewById(R.id.listFriends);
                             friendsList.setAdapter(friendsAdapter);

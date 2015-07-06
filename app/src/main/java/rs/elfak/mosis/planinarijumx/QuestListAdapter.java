@@ -28,8 +28,6 @@ public class QuestListAdapter extends ArrayAdapter<String>
 
     public View getView(int position, View view, ViewGroup parent)
     {
-        //LayoutInflater inflater = context.getLayoutInflater();
-        //LayoutInflater inflater = (LayoutInflater) context.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
         LayoutInflater inflater = LayoutInflater.from(context);
         View rowView = inflater.inflate(R.layout.list_quest_item, null, true);
 

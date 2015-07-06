@@ -11,13 +11,17 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Large Text"
-        android:id="@+id/questName" />
+        android:id="@+id/questName"
+        android:layout_marginTop="7dp"
+        android:layout_marginLeft="8dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="Small Text"
-        android:id="@+id/questStatus" />
+        android:id="@+id/questStatus"
+        android:layout_marginLeft="8dp"
+        android:layout_marginBottom="7dp" />
 
 </LinearLayout>

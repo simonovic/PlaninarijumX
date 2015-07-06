@@ -26,6 +26,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 
 public class RankingActivity extends Activity
@@ -37,6 +38,10 @@ public class RankingActivity extends Activity
     EditText rangEditText;
     private int userID;
     SharedPreferences shPref;
+    ListView userListView;
+    List listRank;
+    List listName;
+    List listPoints;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -47,6 +52,10 @@ public class RankingActivity extends Activity
         rangEditText = (EditText)findViewById(R.id.currang);
         shPref = getSharedPreferences(Constants.loginpref, Context.MODE_PRIVATE);
         userID = shPref.getInt(Constants.userIDpref, 0);
+
+        listRank = new ArrayList<String>();
+        listName = new ArrayList<String>();
+        listPoints = new ArrayList<String>();
 
         new Thread(new Runnable() {
             @Override
@@ -70,6 +79,7 @@ public class RankingActivity extends Activity
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+
                             int pom;
                             int rang = 0;
                             do
@@ -77,15 +87,30 @@ public class RankingActivity extends Activity
                                 pom = usersList.get(rang).getId();
                                 rang++;
                             } while (pom != userID);
-                            rangEditText.setText(""+rang);
-                            usersAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1);
+                            rangEditText.setText(rang + ".");
+
+                            pom = 1;
                             for (Iterator<OsobaReducedPlus> i = usersList.iterator(); i.hasNext(); ) {
                                 OsobaReducedPlus o = i.next();
-                                usersAdapter.add(o.getUser());
+                                listRank.add(pom+".  ");
+                                listName.add(o.getUser());
+                                listPoints.add(o.getBrPoena()+"");
+                                pom++;
                             }
-                            ListView plListView = (ListView) findViewById(R.id.ranking);
-                            plListView.setAdapter(usersAdapter);
-                            plListView.setOnItemClickListener(osobaClickListener);
+                            final String[] userRank = (String[]) listRank.toArray(new String[listRank.size()]);
+                            final String[] userName = (String[]) listName.toArray(new String[listName.size()]);
+                            final String[] userPoints = (String[]) listPoints.toArray(new String[listPoints.size()]);
+
+                            usersAdapter = new RankListAdapter(RankingActivity.this, userRank, userName, userPoints);
+                            userListView = (ListView) findViewById(R.id.ranking);
+                            userListView.setAdapter(usersAdapter);
+
+                            userListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                @Override
+                                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                    Toast.makeText(getApplicationContext(), userName[position], Toast.LENGTH_LONG).show();
+                                }
+                            });
                         }
                     });
 
