@@ -114,6 +114,7 @@ public class MyProfileActivity extends Activity
 
         if (id == R.id.quests) {
             Intent i = new Intent(this, QuestsActivity.class);
+            i.putExtra("userID", korisnik.getId());
             startActivity(i);
         }
 

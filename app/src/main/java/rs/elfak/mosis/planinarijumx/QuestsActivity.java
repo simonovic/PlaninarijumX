@@ -25,28 +25,9 @@ public class QuestsActivity extends Activity
 {
     ListView questList;
     QuestListAdapter adapter;
-
-    String[] name ={
-            "Safari",
-            "Camera",
-            "Global",
-            "FireFox",
-            "UC Browser",
-            "Android Folder",
-            "VLC Player",
-            "Cold War"
-    };
-
-    String[] status ={
-            "Dovrseno",
-            "Nedovrseno",
-            "Dovrseno",
-            "Nedovrseno",
-            "Nedovrseno",
-            "Dovrseno",
-            "Dovrseno",
-            "Nedovrseno"
-    };
+    private int userId;
+    private String response;
+    private ArrayList<Quest> quests;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -54,32 +35,25 @@ public class QuestsActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quests);
 
-        adapter = new QuestListAdapter(this, name, status);
-        questList = (ListView) findViewById(R.id.list);
-        questList.setAdapter(adapter);
-
-        questList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getApplicationContext(), name[position], Toast.LENGTH_LONG).show();
-            }
-        });
+        Bundle extras = getIntent().getExtras();
+        userId = extras.getInt("userID");
 
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
 
+                    String request = "2\n"+userId+"\n";
                     InetAddress adr = InetAddress.getByName(Constants.address);
                     Socket socket = new Socket(adr, Constants.PORT);
                     PrintWriter printWriter = new PrintWriter(socket.getOutputStream(),true);
-                    /*printWriter.write(request);
+                    printWriter.write(request);
                     printWriter.flush();
 
                     BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    pl = in.readLine();
+                    response = in.readLine();
                     Gson gson = new GsonBuilder().serializeNulls().create();
-                    planine = gson.fromJson(pl, new TypeToken<ArrayList<Planina>>() {}.getType());
+                    quests = gson.fromJson(response, new TypeToken<ArrayList<Quest>>() {}.getType());
 
                     printWriter.close();
                     socket.close();
@@ -87,16 +61,22 @@ public class QuestsActivity extends Activity
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            planineAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1);
-                            for (Iterator<Planina> i = planine.iterator(); i.hasNext(); ) {
-                                Planina pl = i.next();
-                                planineAdapter.add(pl.getIme());
-                            }
-                            ListView plListView = (ListView) findViewById(R.id.planinaListView);
-                            plListView.setAdapter(planineAdapter);
-                            plListView.setOnItemClickListener(planinaClickListener);
+
+                            final String[] name = {};
+                            final String[] status = {};
+                            name[0] = "1";
+                            adapter = new QuestListAdapter(QuestsActivity.this, name, status);
+                            questList = (ListView) findViewById(R.id.list);
+                            questList.setAdapter(adapter);
+
+                            questList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                @Override
+                                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                    Toast.makeText(getApplicationContext(), name[position], Toast.LENGTH_LONG).show();
+                                }
+                            });
                         }
-                    });*/
+                    });
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
