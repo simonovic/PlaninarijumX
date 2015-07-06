@@ -58,4 +58,5 @@
     <string name="title_activity_planina">PlaninaActivity</string>
     <string name="title_activity_quests">Kvizovi</string>
     <string name="title_activity_ranking">Rang lista</string>
+    <string name="ask_friend">Pitaj prijatelja</string>
 </resources>
