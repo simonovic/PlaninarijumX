@@ -126,12 +126,12 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
 
         String kvizovi = i.getStringExtra("questInfo");
         if(kvizovi != null) {
-            startZaSimona(kvizovi);
+            startZaSimona(kvizovi, 2);
         }
 
     }
 
-    private void startZaSimona(String informacije)
+    private void startZaSimona(String informacije,int code)
     {
         String [] linije = informacije.split("\n");
         questName = linije[0];
@@ -156,8 +156,10 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
         {
             questSolver.setPosition(1);
         }
-        mNavigationDrawerFragment.setMenuVisibility(false);
-        mNavigationDrawerFragment.selectItem(4);
+        if(code != 3) {
+            mNavigationDrawerFragment.setMenuVisibility(false);
+            mNavigationDrawerFragment.selectItem(4);
+        }
         return;
 
     }
@@ -438,7 +440,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                                     @Override
                                     public void run() {
                                         AlertDialog.Builder builder2 = new AlertDialog.Builder(MapActivity.this);
-                                        builder2.setTitle("Izaberi prijatelja");
+                                        builder2.setTitle("Izaberi planinu");
                                         String[] imenaPlanina = new String[planine.size()];
                                         for (int i = 0; i < planine.size(); i++) {
                                             imenaPlanina[i] = planine.get(i).getIme();
@@ -473,11 +475,85 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
 
                 break;
             case 5:
-                mTitle = getString(R.string.title_section5) + " : " + questName;
-                prikaziQuest();
+                if(questSolver != null) {
+                    mTitle = getString(R.string.title_section5) + " : " + questName;
+                    prikaziQuest();
+                }
+                else
+                {
+                    mTitle = getString(R.string.title_section5);
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                InetAddress adr = InetAddress.getByName(Constants.address);
+                                Socket socket = new Socket(adr, Constants.PORT);
+                                PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
+                                printWriter.write("5\n");
+                                printWriter.flush();
+
+                                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                                String pl = in.readLine();
+                                Gson gson = new GsonBuilder().serializeNulls().create();
+                                final ArrayList<Planina> planine = gson.fromJson(pl, new TypeToken<ArrayList<Planina>>() {
+                                }.getType());
+
+                                printWriter.close();
+                                socket.close();
+
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        AlertDialog.Builder builder2 = new AlertDialog.Builder(MapActivity.this);
+                                        builder2.setTitle("Izaberi planinu");
+                                        String[] imenaPlanina = new String[planine.size()];
+                                        for (int i = 0; i < planine.size(); i++) {
+                                            imenaPlanina[i] = planine.get(i).getIme();
+                                        }
+                                        builder2.setItems(imenaPlanina, new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                Gson gson = new GsonBuilder().serializeNulls().create();
+                                                Planina planina = planine.get(which);
+                                                String info = gson.toJson(planina);
+                                                Intent intent = new Intent(MapActivity.this,PlaninaActivity.class);
+                                                intent.putExtra("planina",info);
+                                                intent.putExtra("code",3);
+                                                startActivityForResult(intent,3);
+
+                                            }
+                                        });
+
+                                        AlertDialog alertDialog = builder2.create();
+                                        alertDialog.show();
+                                    }
+                                });
+                            } catch (UnknownHostException e) {
+                                e.printStackTrace();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
+
+
+                }
 
                 break;
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == 3)
+            if(resultCode == RESULT_OK)
+            {
+                String info = data.getStringExtra("questInfo");
+                if(info != null) {
+                    startZaSimona(info, 3);
+                    prikaziQuest();
+                }
+            }
     }
 
     private void dodavanjeKviza(int planina)
@@ -837,7 +913,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
         else {
             Marker marker1 = map.addMarker(new MarkerOptions().position(latLng)
                     .title(title));
-            marker1.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_monyes));
+            marker1.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_finishyes));
             resenaPitanja.put(marker1, true);
         }
 

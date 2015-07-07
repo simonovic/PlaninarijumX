@@ -30,6 +30,7 @@ public class PlaninaActivity extends Activity
     private static Planina pl;
     private ArrayList<Quest> questList;
     private ArrayAdapter<String> questAdapter;
+    int code = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -39,6 +40,7 @@ public class PlaninaActivity extends Activity
 
         Bundle extras = getIntent().getExtras();
         String plString = extras.getString("planina");
+        code = extras.getInt("code");
         Gson gson = new GsonBuilder().serializeNulls().create();
         pl = gson.fromJson(plString, Planina.class);
 
@@ -138,10 +140,19 @@ public class PlaninaActivity extends Activity
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Intent i = new Intent(getApplication(), MapActivity.class);
-                                String podaci = q.getIme() + "\n" + q.getId() + "\n" + pozicija + "\n" + info;
-                                i.putExtra("questInfo",podaci);
-                                startActivity(i);
+                                if(code != 3) {
+                                    Intent i = new Intent(getApplication(), MapActivity.class);
+                                    String podaci = q.getIme() + "\n" + q.getId() + "\n" + pozicija + "\n" + info;
+                                    i.putExtra("questInfo", podaci);
+                                    startActivity(i);
+                                }else
+                                {
+                                    Intent returnIntent = new Intent();
+                                    String podaci = q.getIme() + "\n" + q.getId() + "\n" + pozicija + "\n" + info;
+                                    returnIntent.putExtra("questInfo",podaci);
+                                    setResult(RESULT_OK,returnIntent);
+                                    finish();
+                                }
                             }
                         });
 
