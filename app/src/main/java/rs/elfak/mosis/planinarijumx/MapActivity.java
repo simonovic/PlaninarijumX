@@ -32,6 +32,8 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -82,6 +84,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
 
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -118,35 +121,40 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
         }
 
         String kvizovi = i.getStringExtra("questInfo");
-        if(kvizovi != null)
-        {
-            String [] linije = kvizovi.split("\n");
-            questName = linije[0];
-            int questID = Integer.parseInt(linije[1]);
-            int pozicija = Integer.parseInt(linije[2]);
-            Gson gson = new GsonBuilder().serializeNulls().create();
-            ArrayList<NovoMesto> mestaUKvizu = gson.fromJson(linije[3], new TypeToken<ArrayList<NovoMesto>>() {}.getType());
-            quest = new ArrayList<Place>();
-            Place.ID = 0;
-            for(int j = 0; j < mestaUKvizu.size(); j++)
-            {
-                NovoMesto novoMesto = mestaUKvizu.get(j);
-                Place p = new Place(novoMesto.getLat(),novoMesto.getLon(),novoMesto.getOdgovor(),novoMesto.getPitanje(),novoMesto.getId());
-                quest.add(p);
-            }
-            questSolver = new QuestSolver(quest,questID);
-            if(pozicija != -1)
-            {
-                questSolver.setPosition(quest.size()  - pozicija);
-            }else
-            {
-                questSolver.setPosition(quest.size()  - pozicija);
-            }
-            mNavigationDrawerFragment.setMenuVisibility(false);
-            mNavigationDrawerFragment.selectItem(4);
-            return;
-
+        if(kvizovi != null) {
+            startZaSimona(kvizovi);
         }
+
+    }
+
+    private void startZaSimona(String informacije)
+    {
+        String [] linije = informacije.split("\n");
+        questName = linije[0];
+        int questID = Integer.parseInt(linije[1]);
+        int pozicija = Integer.parseInt(linije[2]);
+        Gson gson = new GsonBuilder().serializeNulls().create();
+        ArrayList<NovoMesto> mestaUKvizu = gson.fromJson(linije[3], new TypeToken<ArrayList<NovoMesto>>() {}.getType());
+        quest = new ArrayList<Place>();
+        Place.ID = 1;
+        for(int j = 0; j < mestaUKvizu.size(); j++)
+        {
+            NovoMesto novoMesto = mestaUKvizu.get(j);
+            Place p = new Place(novoMesto.getLat(),novoMesto.getLon(),novoMesto.getOdgovor(),novoMesto.getPitanje(),novoMesto.getId());
+            quest.add(p);
+        }
+        questSolver = new QuestSolver(quest,questID);
+        if(pozicija != -1)
+        {
+            questSolver.setPosition(pozicija);
+            questSolver.setZapocet(true);
+        }else
+        {
+            questSolver.setPosition(1);
+        }
+        mNavigationDrawerFragment.setMenuVisibility(false);
+        mNavigationDrawerFragment.selectItem(4);
+        return;
 
     }
 
@@ -156,10 +164,43 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
             for(int i = 0 ; i < quest.size(); i++)
             {
                 LatLng latLng = new LatLng(quest.get(i).getLat(), quest.get(i).getLng());
-                map.addMarker(new MarkerOptions().position(latLng).title((quest.get(i).getId() + 1) + ". " + getString(R.string.question)));
+                if(quest.get(i).getId() != 0)
+                    map.addMarker(new MarkerOptions().position(latLng).
+                            title((quest.size() - quest.get(i).getId()) + ". " + getString(R.string.question)))
+                            .setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_monno));
+                else
+                {
+                    map.addMarker(new MarkerOptions().position(latLng).
+                            title(getString(R.string.finish)))
+                            .setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_finishno));
+                }
             }
-        else
+        else if(questSolver.getPosition() == 0)
         {
+            for(int i = 0 ; i < quest.size(); i++)
+            {
+                LatLng latLng = new LatLng(quest.get(i).getLat(), quest.get(i).getLng());
+                if(quest.get(i).getId() != 0)
+                    map.addMarker(new MarkerOptions().position(latLng).
+                            title((quest.size() - quest.get(i).getId()) + ". " + getString(R.string.question)))
+                            .setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_monyes));
+                else
+                {
+                    map.addMarker(new MarkerOptions().position(latLng).
+                            title(getString(R.string.finish)))
+                            .setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_finishyes));
+                }
+            }
+        }else
+        {
+            for(int i = 0; i < quest.size(); i++)
+            {
+                LatLng latLng = new LatLng(quest.get(i).getLat(), quest.get(i).getLng());
+                if(questSolver.getPosition() > quest.get(i).getId())
+                    map.addMarker(new MarkerOptions().position(latLng).
+                            title((quest.size() - quest.get(i).getId()) + ". " + getString(R.string.question)))
+                            .setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_monyes));
+            }
             radiQuest();
         }
 
@@ -213,6 +254,8 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
         switch (number) {
             case 1:
                 mTitle = getString(R.string.title_section1);
+                LatLng latLng = new LatLng(MainActivity.MyLocation.latitude,MainActivity.MyLocation.longitude);
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,17));
                 break;
             case 2:
                 mTitle = getString(R.string.title_section2);
@@ -330,7 +373,8 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                                 for(int i = 0 ; i < onlinePrijatelji.size(); i++)
                                 {
                                     LatLng latLng = new LatLng(onlinePrijatelji.get(i).getLat(),onlinePrijatelji.get(i).getLon());
-                                    map.addMarker(new MarkerOptions().position(latLng).title((onlinePrijatelji.get(i).getUser())));
+                                    map.addMarker(new MarkerOptions().position(latLng).title((onlinePrijatelji.get(i).getUser())))
+                                            .setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_user));
                                 }
                             }
                         });
@@ -383,7 +427,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                                                 editText = (EditText) view.findViewById(R.id.add_answer);
                                                 String a = editText.getText().toString();
 
-                                                Place place = new Place(latLng.latitude, latLng.longitude, a, q,-1);
+                                                Place place = new Place(latLng.latitude, latLng.longitude, a, q, Place.ID++);
                                                 quest.add(place);
                                                 map.addMarker(new MarkerOptions().position(latLng).title(q));
                                             }
@@ -428,9 +472,9 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                 getMenuInflater().inflate(R.menu.add_quest,menu);
             }else if((mNavigationDrawerFragment.getmCurrentSelectedPosition() == 4)
                     && (questSolver != null)
-                    && (questSolver.getPosition() == questSolver.getQuest().size() - 1))
+                    && (!questSolver.isZapocet()))
             {
-                //getMenuInflater().inflate(R.menu.kviz_menu,menu);
+                getMenuInflater().inflate(R.menu.kviz_menu,menu);
             }
             else
                 getMenuInflater().inflate(R.menu.map, menu);
@@ -468,7 +512,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
 
                                     questSolver.setZapocet(true);
                                     invalidateOptionsMenu();
-
+                                    questSolver.setPosition(1);
                                     radiQuest();
 
 
@@ -500,9 +544,20 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
         if (pitanje == null)
             Toast.makeText(getApplicationContext(), "Cestitam, resio si.", Toast.LENGTH_SHORT)
                     .show();
-        map.addMarker(new MarkerOptions().
-                position(new LatLng(pitanje.getLat(), pitanje.getLng()))
-                .title(pitanje.getPitanje()));
+        if(pitanje.getId() == 0)
+            map.addMarker(new MarkerOptions()
+                    .position(new LatLng(pitanje.getLat(), pitanje.getLng()))
+                    .title(pitanje.getPitanje()))
+                    .setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_finishno));
+        else
+            map.addMarker(new MarkerOptions()
+                    .position(new LatLng(pitanje.getLat(), pitanje.getLng()))
+                    .title(pitanje.getPitanje()))
+                    .setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_monno));
+
+        LatLng latLng = new LatLng(pitanje.getLat(),pitanje.getLng());
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,17));
+
         Toast.makeText(getApplicationContext(), "Odgovor:" + pitanje.getOdgovor(), Toast.LENGTH_SHORT).show();
         map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
@@ -521,6 +576,8 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                                 if (b == true) {
                                     final Place pit = questSolver.getPitanje();
                                     if (pit == null) {
+
+                                        updateMarker(marker,true);
                                         new Thread(new Runnable() {
                                             @Override
                                             public void run()
@@ -549,6 +606,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                                         Toast.makeText(getApplicationContext(), "Cestitam, resio si.", Toast.LENGTH_SHORT)
                                                 .show();
                                     } else {
+                                        updateMarker(marker,false);
                                         new Thread(new Runnable() {
                                             @Override
                                             public void run()
@@ -574,9 +632,19 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
 
                                             }
                                         }).start();
-                                        map.addMarker(new MarkerOptions().
-                                                position(new LatLng(pit.getLat(), pit.getLng()))
-                                                .title(pit.getPitanje()));
+                                        if(pit.getId() == quest.size())
+                                            map.addMarker(new MarkerOptions()
+                                                    .position(new LatLng(pit.getLat(), pit.getLng()))
+                                                    .title(pit.getPitanje()))
+                                                    .setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_finishno));
+                                        else
+                                            map.addMarker(new MarkerOptions()
+                                                    .position(new LatLng(pit.getLat(), pit.getLng()))
+                                                    .title(pit.getPitanje()))
+                                                    .setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_monno));
+
+                                        LatLng latLng = new LatLng(pit.getLat(),pit.getLng());
+                                        map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
                                     }
                                 } else
                                     Toast.makeText(getApplicationContext(), "Pogresio si", Toast.LENGTH_SHORT).show();
@@ -640,6 +708,27 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
         });
     }
 
+    private void updateMarker(Marker marker,boolean cilj)
+    {
+
+        String title;
+        double lat,lon;
+        title = marker.getTitle();
+        lat = marker.getPosition().latitude;
+        lon = marker.getPosition().longitude;
+        marker.remove();
+
+        LatLng latLng = new LatLng(lat,lon);
+        if(!cilj)
+            map.addMarker(new MarkerOptions().position(latLng)
+                    .title(title)).setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_monyes));
+        else
+            map.addMarker(new MarkerOptions().position(latLng)
+                    .title(title)).setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_finishyes));
+
+
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -696,7 +785,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                                 }
                                 quest.clear();
                                 quest = null;
-                                Place.ID = 0;
+                                Place.ID = 1;
                                 if(map != null)
                                     map.clear();
                                 if(planinaID != -3)
@@ -742,7 +831,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                 StringTokenizer tokeni = new StringTokenizer(adresa, ":");
                 adresa = tokeni.nextToken();
                 String sendBuf = pitanje + "\n" +
-                        lat + "\n" + lon + "\n";
+                        lat + "\n" + lon + "\n" + LogActivity.userName + "\n";
 
                 try {
                     InetAddress adr = InetAddress.getByName(adresa);
@@ -772,17 +861,78 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                                 public void onClick(DialogInterface dialog, int which) {
                                     boolean b = questSolver.Solve(odgovor);
                                     if (b == true) {
-                                        Place pit = questSolver.getPitanje();
+                                        final Place pit = questSolver.getPitanje();
                                         if (pit == null) {
+                                            updateMarker(marker, true);
+                                            new Thread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    try {
+                                                        String sendBuff = "13\n" + LogActivity.userID +
+                                                                "\n" + questSolver.getQuestID() + "\n" +
+                                                                0 + "\n"
+                                                                + 0 + "\n";
+                                                        InetAddress adr = InetAddress.getByName(Constants.address);
+                                                        Socket socket = new Socket(adr, Constants.PORT);
+                                                        PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
+                                                        printWriter.write(sendBuff);
+                                                        printWriter.flush();
+
+                                                        printWriter.close();
+                                                        socket.close();
+                                                    } catch (UnknownHostException e) {
+                                                        e.printStackTrace();
+                                                    } catch (IOException e) {
+                                                        e.printStackTrace();
+                                                    }
+
+                                                }
+                                            }).start();
                                             Toast.makeText(getApplicationContext(), "Cestitam, resio si.", Toast.LENGTH_SHORT)
                                                     .show();
                                         } else {
-                                            map.addMarker(new MarkerOptions().
-                                                    position(new LatLng(pit.getLat(), pit.getLng()))
-                                                    .title(pit.getPitanje()));
+                                            updateMarker(marker, false);
+                                            new Thread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    try {
+                                                        String sendBuff = "13\n" + LogActivity.userID +
+                                                                "\n" + questSolver.getQuestID() + "\n" +
+                                                                (questSolver.getQuest().size() - questSolver.getPosition()) + "\n"
+                                                                + 0 + "\n";
+                                                        InetAddress adr = InetAddress.getByName(Constants.address);
+                                                        Socket socket = new Socket(adr, Constants.PORT);
+                                                        PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
+                                                        printWriter.write(sendBuff);
+                                                        printWriter.flush();
+
+                                                        printWriter.close();
+                                                        socket.close();
+                                                    } catch (UnknownHostException e) {
+                                                        e.printStackTrace();
+                                                    } catch (IOException e) {
+                                                        e.printStackTrace();
+                                                    }
+
+                                                }
+                                            }).start();
+                                            if (pit.getId() == quest.size())
+                                                map.addMarker(new MarkerOptions()
+                                                        .position(new LatLng(pit.getLat(), pit.getLng()))
+                                                        .title(pit.getPitanje()))
+                                                        .setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_finishno));
+                                            else
+                                                map.addMarker(new MarkerOptions()
+                                                        .position(new LatLng(pit.getLat(), pit.getLng()))
+                                                        .title(pit.getPitanje()))
+                                                        .setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_monno));
+
+                                            LatLng latLng = new LatLng(pit.getLat(),pit.getLng());
+                                            map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
+
                                         }
-                                    } else
-                                        Toast.makeText(getApplicationContext(), "Pogresio si", Toast.LENGTH_SHORT).show();
+                                    }else
+                                        Toast.makeText(getApplicationContext(), "Prijatelj pogresio", Toast.LENGTH_SHORT).show();
 
                                 }
                             });
