@@ -21,6 +21,7 @@ public class LogActivity extends Activity
 {
     SharedPreferences shPref;
     static int userID;
+    static String userName;
     static Activity trenutnaAktivnost;
 
     @Override
@@ -31,10 +32,11 @@ public class LogActivity extends Activity
         setContentView(R.layout.activity_log);
         shPref = getSharedPreferences(Constants.loginpref, Context.MODE_PRIVATE);
         userID = shPref.getInt(Constants.userIDpref, 0);
+        userName = shPref.getString(Constants.userNamepref,"false");
         SharedPreferences.Editor editor = shPref.edit();
         editor.putInt(Constants.userIDpref, userID);
         editor.commit();
-        if (userID != 0)
+        if ((userID != 0) && (!userName.equals("false")))
         {
             Intent i = new Intent(this, MainActivity.class);
             i.putExtra("userID", userID);
@@ -99,6 +101,7 @@ public class LogActivity extends Activity
                             SharedPreferences.Editor editor = shPref.edit();
                             userID = response;
                             editor.putInt(Constants.userIDpref, userID);
+                            editor.putString(Constants.userNamepref,ime.getText().toString());
                             editor.commit();
                             userID = shPref.getInt(Constants.userIDpref, 0);
                             Intent i = new Intent(LogActivity.this, MainActivity.class);
