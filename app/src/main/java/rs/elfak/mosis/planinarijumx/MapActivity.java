@@ -58,6 +58,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Random;
 import java.util.StringTokenizer;
 
@@ -292,7 +293,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                             public void run() {
                                 try {
 
-                                    String request = "15\n" + LogActivity.userID + "\n" + MainActivity.MyLocation.latitude + "\n" + MainActivity.MyLocation.longitude + "\n" + 9900 + "\n";
+                                    String request = "15\n" + LogActivity.userID + "\n" + MainActivity.MyLocation.latitude + "\n" + MainActivity.MyLocation.longitude + "\n" + 10000000 + "\n";
                                     InetAddress adr = InetAddress.getByName(Constants.address);
                                     Socket socket = new Socket(adr, Constants.PORT);
                                     PrintWriter printWriter = new PrintWriter(socket.getOutputStream(),true);
@@ -305,33 +306,10 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                                     onlineFriends = gson.fromJson(response, new TypeToken<ArrayList<OnlinePrijatelj>>() {}.getType());
 
                                     response = in.readLine();
-                                    placesInRadius = gson.fromJson(response, new TypeToken<ArrayList<NovoMesto>>() {}.getType());
+                                    placesInRadius = gson.fromJson(response, new TypeToken<ArrayList<Mesto>>() {}.getType());
 
                                     response = in.readLine();
                                     usersQuests = gson.fromJson(response, new TypeToken<ArrayList<OsobaRadiQuest>>() {}.getType());
-
-                                    Mesto m1 = new Mesto(1, 43.3333, 21.2222, 0, 1);
-                                    Mesto m2 = new Mesto(2, 43.3433, 21.2222, 1, 1);
-                                    Mesto m3 = new Mesto(3, 43.3533, 21.2222, 2, 1);
-                                    Mesto n1 = new Mesto(4, 43.3333, 21.2222, 0, 2);
-                                    Mesto n2 = new Mesto(5, 43.3333, 21.2322, 1, 2);
-                                    Mesto n3 = new Mesto(6, 43.3333, 21.2422, 2, 2);
-                                    Mesto q1 = new Mesto(7, 43.4333, 21.2222, 0, 3);
-                                    Mesto q2 = new Mesto(8, 43.5333, 21.2322, 1, 3);
-                                    Mesto q3 = new Mesto(9, 43.6333, 21.2422, 2, 3);
-
-                                    placesInRadius.add(m1);
-                                    placesInRadius.add(m2);
-                                    placesInRadius.add(m3);
-                                    placesInRadius.add(n1);
-                                    placesInRadius.add(n2);
-                                    placesInRadius.add(n3);
-                                    placesInRadius.add(q1);
-                                    placesInRadius.add(q2);
-                                    placesInRadius.add(q3);
-
-                                    OsobaRadiQuest o1 = new OsobaRadiQuest(1, 1, 1, 1);
-                                    OsobaRadiQuest o2 = new OsobaRadiQuest(2, 1, 2, 2);
 
                                     printWriter.close();
                                     socket.close();
@@ -340,22 +318,56 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                                         @Override
                                         public void run() {
 
-                                            for (int i = 0 ; i < onlineFriends.size(); i++)
-                                            {
-                                                LatLng latLng = new LatLng(onlineFriends.get(i).getLat(),onlineFriends.get(i).getLon());
-                                                map.addMarker(new MarkerOptions().position(latLng).title((onlineFriends.get(i).getUser())).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_user)));
+                                            for (int i = 0; i < onlineFriends.size(); i++) {
+                                                LatLng latLng = new LatLng(onlineFriends.get(i).getLat(), onlineFriends.get(i).getLon());
+                                                map.addMarker(new MarkerOptions().position(latLng).title("user").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_user)));
                                             }
 
-                                            int pom = 0;
-                                            for (int i = 0; i < placesInRadius.size(); i++)
-                                            {
+                                            int pom;
+                                            int userQID;
+                                            int mestoQID;
+                                            int ddd = 0;
+                                            for (int i = 0; i < placesInRadius.size(); i++) {
 
-                                                LatLng latLng = new LatLng(placesInRadius.get(i).getLat(),placesInRadius.get(i).getLon());
-                                                map.addMarker(new MarkerOptions().position(latLng)/*.title((placesInRadius.get(i).getUser()))*/.icon(BitmapDescriptorFactory.fromResource(pom)));
+                                                boolean bingo = false;
+                                                int br = 0;
+                                                mestoQID = placesInRadius.get(i).getQuestId();
+                                                if (usersQuests.size() > 0)
+                                                {
+                                                    do {
+                                                        userQID = usersQuests.get(br).getQuestId();
+                                                        if (mestoQID == userQID)
+                                                            bingo = true;
+                                                        ddd = usersQuests.get(br).getMestoBr();
+                                                        br++;
+                                                    } while ((mestoQID != userQID) && (br < usersQuests.size()));
+                                                }
+
+                                                if (bingo)
+                                                {
+                                                    if (placesInRadius.get(i).getRedBroj() < ddd)
+                                                        pom = R.mipmap.ic_monyes;
+                                                    else
+                                                        pom = R.mipmap.ic_monno;
+                                                }
+                                                else
+                                                    pom = R.mipmap.ic_monnoq;
+
+                                                LatLng latLng = new LatLng(placesInRadius.get(i).getLat(), placesInRadius.get(i).getLon());
+                                                map.addMarker(new MarkerOptions().position(latLng).title("" + mestoQID).icon(BitmapDescriptorFactory.fromResource(pom)));
                                             }
 
-                                            CircleOptions circleOptions = new CircleOptions().center(MainActivity.MyLocation).radius(radius).fillColor(0x4033B5E5).strokeColor(0x00000000);//51 181 229
+                                            CircleOptions circleOptions = new CircleOptions().center(MainActivity.MyLocation).radius(100).fillColor(0x4033B5E5).strokeColor(0x00000000);//51 181 229
                                             map.addCircle(circleOptions);
+
+                                            map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                                                @Override
+                                                public boolean onMarkerClick(Marker marker)
+                                                {
+                                                    Toast.makeText(MapActivity.this, "Klik na moj marker!", Toast.LENGTH_LONG).show();
+                                                    return false;
+                                                }
+                                            });
                                         }
                                     });
 
