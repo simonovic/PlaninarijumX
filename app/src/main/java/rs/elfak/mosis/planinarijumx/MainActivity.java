@@ -163,6 +163,7 @@ public class MainActivity extends Activity
                                 ((EditText) view.findViewById(R.id.add_question)).postInvalidate();
                                 final EditText odgovor = (EditText) view.findViewById(R.id.add_answer);
                                 ((EditText) view.findViewById(R.id.add_question)).setKeyListener(null);
+                                ((EditText) view.findViewById(R.id.add_answer)).setKeyListener(null);
                                 builder.setView(view);
                                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                     @Override

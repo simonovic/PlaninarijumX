@@ -60,7 +60,10 @@ public class QuestSolver
 
     public void setPosition(int position) {
         this.position = position;
-        zapocet = true;
+        if(position == quest.size() + 1)
+            zapocet = false;
+        else
+            zapocet = true;
     }
 
     public ArrayList<Place> getQuest() {
@@ -86,5 +89,13 @@ public class QuestSolver
     public void addPoeni(int amount)
     {
         poeni += amount;
+    }
+
+    public int getQuestID() {
+        return questID;
+    }
+
+    public void setQuestID(int questID) {
+        this.questID = questID;
     }
 }
