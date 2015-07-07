@@ -140,7 +140,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
         for(int j = 0; j < mestaUKvizu.size(); j++)
         {
             NovoMesto novoMesto = mestaUKvizu.get(j);
-            Place p = new Place(novoMesto.getLat(),novoMesto.getLon(),novoMesto.getOdgovor(),novoMesto.getPitanje(),novoMesto.getId());
+            Place p = new Place(novoMesto.getLat(),novoMesto.getLon(),novoMesto.getOdgovor(),novoMesto.getPitanje(),novoMesto.getRedBroj());
             quest.add(p);
         }
         questSolver = new QuestSolver(quest,questID);
@@ -164,7 +164,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
             for(int i = 0 ; i < quest.size(); i++)
             {
                 LatLng latLng = new LatLng(quest.get(i).getLat(), quest.get(i).getLng());
-                if(quest.get(i).getId() != 0)
+                if(quest.get(i).getId() != quest.size())
                     map.addMarker(new MarkerOptions().position(latLng).
                             title((quest.size() - quest.get(i).getId()) + ". " + getString(R.string.question)))
                             .setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_monno));
@@ -180,7 +180,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
             for(int i = 0 ; i < quest.size(); i++)
             {
                 LatLng latLng = new LatLng(quest.get(i).getLat(), quest.get(i).getLng());
-                if(quest.get(i).getId() != 0)
+                if(quest.get(i).getId() != quest.size())
                     map.addMarker(new MarkerOptions().position(latLng).
                             title((quest.size() - quest.get(i).getId()) + ". " + getString(R.string.question)))
                             .setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_monyes));
@@ -544,7 +544,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
         if (pitanje == null)
             Toast.makeText(getApplicationContext(), "Cestitam, resio si.", Toast.LENGTH_SHORT)
                     .show();
-        if(pitanje.getId() == 0)
+        if(pitanje.getId() == quest.size())
             map.addMarker(new MarkerOptions()
                     .position(new LatLng(pitanje.getLat(), pitanje.getLng()))
                     .title(pitanje.getPitanje()))
@@ -898,7 +898,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                                                     try {
                                                         String sendBuff = "13\n" + LogActivity.userID +
                                                                 "\n" + questSolver.getQuestID() + "\n" +
-                                                                (questSolver.getQuest().size() - questSolver.getPosition()) + "\n"
+                                                                (pit.getId()) + "\n"
                                                                 + 0 + "\n";
                                                         InetAddress adr = InetAddress.getByName(Constants.address);
                                                         Socket socket = new Socket(adr, Constants.PORT);

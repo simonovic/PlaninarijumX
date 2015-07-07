@@ -4,24 +4,23 @@ package rs.elfak.mosis.planinarijumx;
  * Created by filip on 6/23/15.
  */
 public class Place {
-    public static int ID = 0;
+    public static int ID = 1;
     private int id;
     private String pitanje;
     private String odgovor;
     private double lat;
     private double lng;
-    private int pitanjeID;
+    private boolean reseno;
 
 
     public Place(double lat, double lng, String odgovor, String pitanje,int pitanjeID)
     {
-        id = ID;
         this.lat = lat;
         this.lng = lng;
         this.odgovor = odgovor;
         this.pitanje = pitanje;
-        this.pitanjeID = pitanjeID;
-        ID++;
+        this.id = pitanjeID;
+        reseno = false;
     }
 
     public int getId() {
@@ -44,11 +43,11 @@ public class Place {
         return pitanje;
     }
 
-    public int getPitanjeID() {
-        return pitanjeID;
+    public boolean isReseno() {
+        return reseno;
     }
 
-    public void setPitanjeID(int pitanjeID) {
-        this.pitanjeID = pitanjeID;
+    public void setReseno(boolean reseno) {
+        this.reseno = reseno;
     }
 }

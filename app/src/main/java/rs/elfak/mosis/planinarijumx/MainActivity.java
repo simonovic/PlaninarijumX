@@ -150,6 +150,7 @@ public class MainActivity extends Activity
                     final String pitanje = in.readLine();
                     final double lat = Double.parseDouble(in.readLine());
                     final double lon = Double.parseDouble(in.readLine());
+                    final String userPrijatelja = in.readLine();
 
                     if(pitanje != null)
                     {
@@ -163,8 +164,8 @@ public class MainActivity extends Activity
                                 ((EditText) view.findViewById(R.id.add_question)).postInvalidate();
                                 final EditText odgovor = (EditText) view.findViewById(R.id.add_answer);
                                 ((EditText) view.findViewById(R.id.add_question)).setKeyListener(null);
-                                ((EditText) view.findViewById(R.id.add_answer)).setKeyListener(null);
                                 builder.setView(view);
+                                builder.setTitle("Pitao te: " + userPrijatelja);
                                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
@@ -224,6 +225,12 @@ public class MainActivity extends Activity
                         public void run() {
                             try
                             {
+                                if(LogActivity.userID == 0)
+                                {
+
+                                    SharedPreferences sharedPreferences= getSharedPreferences(Constants.loginpref, Context.MODE_PRIVATE);
+                                    LogActivity.userID = sharedPreferences.getInt(Constants.userIDpref, 0);
+                                }
                                 OsobaMesto osobaMesto = new OsobaMesto(LogActivity.userID,MyLocation.latitude,MyLocation.longitude);
                                 String sendBuff = "10\n" + osobaMesto.toString() + "\n";
                                 InetAddress adr = InetAddress.getByName(Constants.address);
@@ -333,6 +340,7 @@ public class MainActivity extends Activity
                // disconnect();
                 SharedPreferences.Editor editor = shPref.edit();
                 editor.putInt(Constants.userIDpref, 0);
+                editor.putString(Constants.userNamepref,"");
                 editor.commit();
                 finish();
                 break;

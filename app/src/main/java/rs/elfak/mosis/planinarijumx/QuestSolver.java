@@ -16,7 +16,7 @@ public class QuestSolver
 
     public QuestSolver(ArrayList<Place> quest,int id) {
         this.quest = quest;
-        position = quest.size() - 1;
+        position = - 1;
         questID = id;
         zapocet = false;
         poeni = 0;
@@ -26,8 +26,8 @@ public class QuestSolver
     {
         if(odg == null)
             return false;
-        if(odg.equals(""))
-            return false;
+        //if(odg.equals(""))
+        //    return false;
         System.out.println("uneo si"+odg);
 
         for(int i = 0; i < quest.size(); i++)
@@ -36,7 +36,8 @@ public class QuestSolver
                 System.out.println(quest.get(i).getOdgovor());
                 if(odg.equals(quest.get(i).getOdgovor()))
                 {
-                    position--;
+                    position++;
+                    quest.get(i).setReseno(true);
                     return true;
                 }
                 else
@@ -60,10 +61,6 @@ public class QuestSolver
 
     public void setPosition(int position) {
         this.position = position;
-        if(position == quest.size() + 1)
-            zapocet = false;
-        else
-            zapocet = true;
     }
 
     public ArrayList<Place> getQuest() {

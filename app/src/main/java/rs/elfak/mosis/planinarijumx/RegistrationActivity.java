@@ -86,7 +86,8 @@ public class RegistrationActivity extends Activity
 
     public void registrujMe(View view)
     {
-        String username,pass,ime,prezime,brtel,imgName;
+        final String username,pass,ime,prezime,brtel;
+        String imgName;
         imgName = "";
         username = ((EditText) findViewById(R.id.korIme1)).getText().toString();
         pass = ((EditText) findViewById(R.id.lozinka1)).getText().toString();
@@ -140,6 +141,7 @@ public class RegistrationActivity extends Activity
 
                     BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     String prijem = in.readLine();
+                    int id = Integer.parseInt(in.readLine());
                     printWriter.close();
                     dataOutputStreamput.close();
                     in.close();
@@ -152,12 +154,17 @@ public class RegistrationActivity extends Activity
                         {
                             SharedPreferences shPref = getSharedPreferences(Constants.loginpref, Context.MODE_PRIVATE);
                             SharedPreferences.Editor editor = shPref.edit();
-                            //userID = response;
-                            editor.putInt(Constants.userIDpref, 1);
+                            editor.putInt(Constants.userIDpref, id);
+                            editor.putString(Constants.userNamepref, username);
                             editor.commit();
-                           // userID = shPref.getInt(Constants.userIDpref, 0);
-                            Intent i = new Intent(RegistrationActivity.this, MainActivity.class);
-                            startActivity(i);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Intent i = new Intent(RegistrationActivity.this, MainActivity.class);
+                                    startActivity(i);
+                                }
+                            });
+
                         }
                     }
 
