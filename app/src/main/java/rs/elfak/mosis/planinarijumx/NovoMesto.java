@@ -6,6 +6,7 @@ import com.google.gson.GsonBuilder;
 /**
  * Created by filip on 6/27/15.
  */
+
 public class NovoMesto {
     String Pitanje;
     String Odgovor;

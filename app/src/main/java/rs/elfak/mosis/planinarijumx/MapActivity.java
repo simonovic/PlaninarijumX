@@ -35,6 +35,7 @@ import android.widget.Toast;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -76,7 +77,9 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
     private int planinaID;
     private QuestSolver questSolver = null;
     private ArrayList<OnlinePrijatelj> onlineFriends;
-    private ArrayList<NovoMesto> placesInRadius;
+    private ArrayList<Mesto> placesInRadius;
+    private ArrayList<OsobaRadiQuest> usersQuests;
+
 
 
     @Override
@@ -230,7 +233,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                             public void run() {
                                 try {
 
-                                    String request = "15\n" + LogActivity.userID + "\n" + MainActivity.MyLocation.latitude + "\n" + MainActivity.MyLocation.longitude + "\n" + radius + "\n";
+                                    String request = "15\n" + LogActivity.userID + "\n" + MainActivity.MyLocation.latitude + "\n" + MainActivity.MyLocation.longitude + "\n" + 9900 + "\n";
                                     InetAddress adr = InetAddress.getByName(Constants.address);
                                     Socket socket = new Socket(adr, Constants.PORT);
                                     PrintWriter printWriter = new PrintWriter(socket.getOutputStream(),true);
@@ -242,6 +245,35 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                                     Gson gson = new GsonBuilder().serializeNulls().create();
                                     onlineFriends = gson.fromJson(response, new TypeToken<ArrayList<OnlinePrijatelj>>() {}.getType());
 
+                                    response = in.readLine();
+                                    placesInRadius = gson.fromJson(response, new TypeToken<ArrayList<NovoMesto>>() {}.getType());
+
+                                    response = in.readLine();
+                                    usersQuests = gson.fromJson(response, new TypeToken<ArrayList<OsobaRadiQuest>>() {}.getType());
+
+                                    Mesto m1 = new Mesto(1, 43.3333, 21.2222, 0, 1);
+                                    Mesto m2 = new Mesto(2, 43.3433, 21.2222, 1, 1);
+                                    Mesto m3 = new Mesto(3, 43.3533, 21.2222, 2, 1);
+                                    Mesto n1 = new Mesto(4, 43.3333, 21.2222, 0, 2);
+                                    Mesto n2 = new Mesto(5, 43.3333, 21.2322, 1, 2);
+                                    Mesto n3 = new Mesto(6, 43.3333, 21.2422, 2, 2);
+                                    Mesto q1 = new Mesto(7, 43.4333, 21.2222, 0, 3);
+                                    Mesto q2 = new Mesto(8, 43.5333, 21.2322, 1, 3);
+                                    Mesto q3 = new Mesto(9, 43.6333, 21.2422, 2, 3);
+
+                                    placesInRadius.add(m1);
+                                    placesInRadius.add(m2);
+                                    placesInRadius.add(m3);
+                                    placesInRadius.add(n1);
+                                    placesInRadius.add(n2);
+                                    placesInRadius.add(n3);
+                                    placesInRadius.add(q1);
+                                    placesInRadius.add(q2);
+                                    placesInRadius.add(q3);
+
+                                    OsobaRadiQuest o1 = new OsobaRadiQuest(1, 1, 1, 1);
+                                    OsobaRadiQuest o2 = new OsobaRadiQuest(2, 1, 2, 2);
+
                                     printWriter.close();
                                     socket.close();
 
@@ -249,10 +281,18 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                                         @Override
                                         public void run() {
 
-                                            for(int i = 0 ; i < onlineFriends.size(); i++)
+                                            for (int i = 0 ; i < onlineFriends.size(); i++)
                                             {
                                                 LatLng latLng = new LatLng(onlineFriends.get(i).getLat(),onlineFriends.get(i).getLon());
-                                                map.addMarker(new MarkerOptions().position(latLng).title((onlineFriends.get(i).getUser())));
+                                                map.addMarker(new MarkerOptions().position(latLng).title((onlineFriends.get(i).getUser())).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_user)));
+                                            }
+
+                                            int pom = 0;
+                                            for (int i = 0; i < placesInRadius.size(); i++)
+                                            {
+
+                                                LatLng latLng = new LatLng(placesInRadius.get(i).getLat(),placesInRadius.get(i).getLon());
+                                                map.addMarker(new MarkerOptions().position(latLng)/*.title((placesInRadius.get(i).getUser()))*/.icon(BitmapDescriptorFactory.fromResource(pom)));
                                             }
 
                                             CircleOptions circleOptions = new CircleOptions().center(MainActivity.MyLocation).radius(radius).fillColor(0x4033B5E5).strokeColor(0x00000000);//51 181 229
