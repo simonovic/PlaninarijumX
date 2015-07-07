@@ -95,7 +95,10 @@ public class FriendsListActivity extends Activity
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id)
         {
-            Toast.makeText(getApplicationContext(), "Klik na prijatelja!", Toast.LENGTH_LONG).show();
+            Intent i = new Intent(FriendsListActivity.this, MyProfileActivity.class);
+            int friendID = friends.get(position).getId();
+            i.putExtra("friendsID", friendID+"");
+            startActivity(i);
         }
     };
 

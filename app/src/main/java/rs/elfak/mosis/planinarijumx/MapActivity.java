@@ -56,9 +56,8 @@ import java.util.Random;
 import java.util.StringTokenizer;
 
 
-public class MapActivity extends ActionBarActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks {
-
+public class MapActivity extends ActionBarActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks
+{
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
@@ -123,9 +122,9 @@ public class MapActivity extends ActionBarActivity
             Place.ID = 0;
             for(int j = 0; j < mestaUKvizu.size(); j++)
             {
-                NovoMesto novoMesto = mestaUKvizu.get(j);
+                /*NovoMesto novoMesto = mestaUKvizu.get(j);
                 Place p = new Place(novoMesto.getLat(),novoMesto.getLon(),novoMesto.getOdgovor(),novoMesto.getPitanje(),novoMesto.getId());
-                quest.add(p);
+                quest.add(p);*/
             }
             questSolver = new QuestSolver(quest,questID);
             if(pozicija != -1)
@@ -292,8 +291,8 @@ public class MapActivity extends ActionBarActivity
                                                 editText = (EditText) view.findViewById(R.id.add_answer);
                                                 String a = editText.getText().toString();
 
-                                                Place place = new Place(latLng.latitude, latLng.longitude, a, q,-1);
-                                                quest.add(place);
+                                                /*Place place = new Place(latLng.latitude, latLng.longitude, a, q,-1);
+                                                quest.add(place);*/
                                                 map.addMarker(new MarkerOptions().position(latLng).title(q));
                                             }
                                         })
@@ -388,7 +387,7 @@ public class MapActivity extends ActionBarActivity
                     && (questSolver != null)
                     && (questSolver.getPosition() == questSolver.getQuest().size() - 1))
             {
-                getMenuInflater().inflate(R.menu.kviz_menu,menu);
+                //getMenuInflater().inflate(R.menu.kviz_menu,menu);
             }
             else
                 getMenuInflater().inflate(R.menu.map, menu);
@@ -428,9 +427,9 @@ public class MapActivity extends ActionBarActivity
                         for(int i = 0; i < quest.size(); i++)
                         {
                             Place p = quest.get(i);
-                            NovoMesto novoMesto = new NovoMesto(-1,p.getPitanje(),p.getOdgovor(),p.getLat(),p.getLng(),p.getId());
+                            /*NovoMesto novoMesto = new NovoMesto(-1,p.getPitanje(),p.getOdgovor(),p.getLat(),p.getLng(),p.getId());
                             sendBuf = novoMesto.toString() + "\n";
-                            printWriter.write(sendBuf);
+                            printWriter.write(sendBuf);*/
                         }
                         printWriter.flush();
                         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -471,7 +470,7 @@ public class MapActivity extends ActionBarActivity
                 }
             }).start();
 
-        }else if(id == R.id.start_quest)
+        }/*else if(id == R.id.start_quest)
         {
             if(!questSolver.isZapocet()) {
                 map.clear();
@@ -572,7 +571,7 @@ public class MapActivity extends ActionBarActivity
                 });
 
             }
-        }
+        }*/
 
         return super.onOptionsItemSelected(item);
     }
@@ -593,7 +592,7 @@ public class MapActivity extends ActionBarActivity
         new Thread(new Runnable() {
             @Override
             public void run() {
-                String adresa = onlinePrijatelj.getIp().substring(1);
+                /*String adresa = onlinePrijatelj.getIp().substring(1);
                 StringTokenizer tokeni = new StringTokenizer(adresa, ":");
                 adresa = tokeni.nextToken();
                 String sendBuf = pitanje + "\n" +
@@ -655,7 +654,7 @@ public class MapActivity extends ActionBarActivity
                     e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
-                }
+                }*/
             }
         }).start();
     }
