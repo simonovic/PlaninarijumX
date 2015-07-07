@@ -56,6 +56,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.StringTokenizer;
@@ -81,6 +82,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
     private ArrayList<OnlinePrijatelj> onlineFriends;
     private ArrayList<Mesto> placesInRadius;
     private ArrayList<OsobaRadiQuest> usersQuests;
+    private HashMap<Marker, Boolean> resenaPitanja;
 
 
 
@@ -110,6 +112,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
         if(map != null)
             map.setMyLocationEnabled(true);
 
+        resenaPitanja = new HashMap<>();
 
         Intent i = getIntent();
         planinaID = i.getIntExtra("planinaID",-3);
@@ -164,15 +167,20 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
             for(int i = 0 ; i < quest.size(); i++)
             {
                 LatLng latLng = new LatLng(quest.get(i).getLat(), quest.get(i).getLng());
-                if(quest.get(i).getId() != quest.size())
-                    map.addMarker(new MarkerOptions().position(latLng).
-                            title((quest.size() - quest.get(i).getId()) + ". " + getString(R.string.question)))
-                            .setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_monno));
+                if(quest.get(i).getId() != quest.size()) {
+                    Marker marker = map.addMarker(new MarkerOptions().position(latLng).
+                            title(("Cilj")));
+
+                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_monno));
+                    resenaPitanja.put(marker,false);
+                }
                 else
                 {
-                    map.addMarker(new MarkerOptions().position(latLng).
-                            title(getString(R.string.finish)))
-                            .setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_finishno));
+                    Marker marker = map.addMarker(new MarkerOptions().position(latLng).
+                            title((quest.get(i).getId()) + ". " + getString(R.string.question)));
+
+                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_finishno));
+                    resenaPitanja.put(marker, false);
                 }
             }
         else if(questSolver.getPosition() == 0)
@@ -180,15 +188,20 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
             for(int i = 0 ; i < quest.size(); i++)
             {
                 LatLng latLng = new LatLng(quest.get(i).getLat(), quest.get(i).getLng());
-                if(quest.get(i).getId() != quest.size())
-                    map.addMarker(new MarkerOptions().position(latLng).
-                            title((quest.size() - quest.get(i).getId()) + ". " + getString(R.string.question)))
-                            .setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_monyes));
+                if(quest.get(i).getId() != quest.size()) {
+                    Marker marker = map.addMarker(new MarkerOptions().position(latLng).
+                            title((quest.get(i).getId() + ". " + getString(R.string.question))));
+
+                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_monyes));
+                    resenaPitanja.put(marker, true);
+                }
                 else
                 {
-                    map.addMarker(new MarkerOptions().position(latLng).
-                            title(getString(R.string.finish)))
-                            .setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_finishyes));
+                    Marker marker = map.addMarker(new MarkerOptions().position(latLng).
+                            title("Cilj"));
+
+                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_finishyes));
+                    resenaPitanja.put(marker, true);
                 }
             }
         }else
@@ -196,10 +209,13 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
             for(int i = 0; i < quest.size(); i++)
             {
                 LatLng latLng = new LatLng(quest.get(i).getLat(), quest.get(i).getLng());
-                if(questSolver.getPosition() > quest.get(i).getId())
-                    map.addMarker(new MarkerOptions().position(latLng).
-                            title((quest.size() - quest.get(i).getId()) + ". " + getString(R.string.question)))
-                            .setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_monyes));
+                if(questSolver.getPosition() > quest.get(i).getId()) {
+                    Marker marker = map.addMarker(new MarkerOptions().position(latLng).
+                            title((quest.size() - quest.get(i).getId()) + ". " + getString(R.string.question)));
+
+                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_monyes));
+                    resenaPitanja.put(marker, true);
+                }
             }
             radiQuest();
         }
@@ -385,65 +401,64 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
             case 4:
                 mTitle = getString(R.string.title_section4);
 
-                AlertDialog.Builder builderName = new AlertDialog.Builder(MapActivity.this);
-                builderName.setTitle("Naziv kviza");
-                final EditText imeKviza = new EditText(MapActivity.this);
-                imeKviza.setHint("Naziv kviza");
-                builderName.setView(imeKviza);
-                builderName.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (planinaID != -3)
-                            finish();
-                        else
-                            mNavigationDrawerFragment.selectItem(0);
-                    }
-                });
-                builderName.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        questName = imeKviza.getText().toString();
-                    }
-                });
-                AlertDialog alertDia = builderName.create();
-                alertDia.setCanceledOnTouchOutside(false);
-                alertDia.show();
-                quest = new ArrayList<Place>();
-                if(map != null)
-                    map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+                if(planinaID == -3)
+                {
+                    new Thread(new Runnable() {
                         @Override
-                        public void onMapLongClick(final LatLng latLng) {
-                            if (mNavigationDrawerFragment.getmCurrentSelectedPosition() == 3) {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
-                                LayoutInflater inflater = MapActivity.this.getLayoutInflater();
-                                final View view = inflater.inflate(R.layout.place_layout, null);
-                                builder.setView(view)
-                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialogInterface, int i) {
-                                                EditText editText = (EditText) view.findViewById(R.id.add_question);
-                                                String q = editText.getText().toString();
+                        public void run() {
+                            try {
+                                InetAddress adr = InetAddress.getByName(Constants.address);
+                                Socket socket = new Socket(adr, Constants.PORT);
+                                PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
+                                printWriter.write("5\n");
+                                printWriter.flush();
 
-                                                editText = (EditText) view.findViewById(R.id.add_answer);
-                                                String a = editText.getText().toString();
+                                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                                String pl = in.readLine();
+                                Gson gson = new GsonBuilder().serializeNulls().create();
+                                final ArrayList<Planina> planine = gson.fromJson(pl, new TypeToken<ArrayList<Planina>>() {
+                                }.getType());
 
-                                                Place place = new Place(latLng.latitude, latLng.longitude, a, q, Place.ID++);
-                                                quest.add(place);
-                                                map.addMarker(new MarkerOptions().position(latLng).title(q));
-                                            }
-                                        })
-                                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                printWriter.close();
+                                socket.close();
+
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        AlertDialog.Builder builder2 = new AlertDialog.Builder(MapActivity.this);
+                                        builder2.setTitle("Izaberi prijatelja");
+                                        String[] imenaPlanina = new String[planine.size()];
+                                        for (int i = 0; i < planine.size(); i++) {
+                                            imenaPlanina[i] = planine.get(i).getIme();
+                                        }
+                                        builder2.setItems(imenaPlanina, new DialogInterface.OnClickListener() {
                                             @Override
-                                            public void onClick(DialogInterface dialogInterface, int i) {
-                                                Toast.makeText(getApplicationContext(), "Odustao si", Toast.LENGTH_SHORT).show();
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                Toast.makeText(getApplicationContext(), planine.get(which).getIme(),
+                                                        Toast.LENGTH_SHORT).show();
+                                                map.moveCamera(CameraUpdateFactory.
+                                                        newLatLngZoom(new LatLng(planine.get(which).getLat(), planine.get(which).getLon()), 17));
+                                                dodavanjeKviza(planine.get(which).getId());
                                             }
                                         });
-                                AlertDialog alertDialog = builder.create();
-                                alertDialog.show();
 
+                                        AlertDialog alertDialog = builder2.create();
+                                        alertDialog.show();
+                                    }
+                                });
+                            } catch (UnknownHostException e) {
+                                e.printStackTrace();
+                            } catch (IOException e) {
+                                e.printStackTrace();
                             }
                         }
-                    });
+                    }).start();
+
+                }
+                else
+                    dodavanjeKviza(planinaID);
+
+
                 break;
             case 5:
                 mTitle = getString(R.string.title_section5) + " : " + questName;
@@ -451,6 +466,70 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
 
                 break;
         }
+    }
+
+    private void dodavanjeKviza(int planina)
+    {
+        planinaID = planina;
+        AlertDialog.Builder builderName = new AlertDialog.Builder(MapActivity.this);
+        builderName.setTitle("Naziv kviza");
+        final EditText imeKviza = new EditText(MapActivity.this);
+        imeKviza.setHint("Naziv kviza");
+        builderName.setView(imeKviza);
+        builderName.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (planinaID != -3)
+                    finish();
+                else
+                    mNavigationDrawerFragment.selectItem(0);
+            }
+        });
+        builderName.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                questName = imeKviza.getText().toString();
+            }
+        });
+        AlertDialog alertDia = builderName.create();
+        alertDia.setCanceledOnTouchOutside(false);
+        alertDia.show();
+        quest = new ArrayList<Place>();
+        if(map != null)
+            map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+                @Override
+                public void onMapLongClick(final LatLng latLng) {
+                    if (mNavigationDrawerFragment.getmCurrentSelectedPosition() == 3) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
+                        LayoutInflater inflater = MapActivity.this.getLayoutInflater();
+                        final View view = inflater.inflate(R.layout.place_layout, null);
+                        builder.setView(view)
+                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        EditText editText = (EditText) view.findViewById(R.id.add_question);
+                                        String q = editText.getText().toString();
+
+                                        editText = (EditText) view.findViewById(R.id.add_answer);
+                                        String a = editText.getText().toString();
+
+                                        Place place = new Place(latLng.latitude, latLng.longitude, a, q, Place.ID++);
+                                        quest.add(place);
+                                        map.addMarker(new MarkerOptions().position(latLng).title(q));
+                                    }
+                                })
+                                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        Toast.makeText(getApplicationContext(), "Odustao si", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                        AlertDialog alertDialog = builder.create();
+                        alertDialog.show();
+
+                    }
+                }
+            });
     }
 
     public void restoreActionBar() {
@@ -513,6 +592,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                                     questSolver.setZapocet(true);
                                     invalidateOptionsMenu();
                                     questSolver.setPosition(1);
+                                    resenaPitanja = new HashMap<Marker, Boolean>();
                                     radiQuest();
 
 
@@ -544,16 +624,23 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
         if (pitanje == null)
             Toast.makeText(getApplicationContext(), "Cestitam, resio si.", Toast.LENGTH_SHORT)
                     .show();
-        if(pitanje.getId() == quest.size())
-            map.addMarker(new MarkerOptions()
+        if(pitanje.getId() == quest.size()) {
+            Marker marker = map.addMarker(new MarkerOptions()
                     .position(new LatLng(pitanje.getLat(), pitanje.getLng()))
-                    .title(pitanje.getPitanje()))
-                    .setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_finishno));
-        else
-            map.addMarker(new MarkerOptions()
+                    .title(pitanje.getPitanje()));
+            marker.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_finishno));
+
+            resenaPitanja.put(marker,false);
+
+        }
+        else {
+            Marker marker = map.addMarker(new MarkerOptions()
                     .position(new LatLng(pitanje.getLat(), pitanje.getLng()))
-                    .title(pitanje.getPitanje()))
-                    .setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_monno));
+                    .title(pitanje.getPitanje()));
+            marker.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_monno));
+
+            resenaPitanja.put(marker, false);
+        }
 
         LatLng latLng = new LatLng(pitanje.getLat(),pitanje.getLng());
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,17));
@@ -562,6 +649,11 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
         map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(final Marker marker) {
+                if(resenaPitanja.containsKey(marker))
+                    if(resenaPitanja.get(marker)) {
+                        Toast.makeText(getApplicationContext(), "Vec si resio ovo pitanje", Toast.LENGTH_SHORT).show();
+                        return true;
+                    }
                 final AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
                 LayoutInflater inflater = MapActivity.this.getLayoutInflater();
                 final View view = inflater.inflate(R.layout.place_layout, null);
@@ -575,6 +667,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                                 boolean b = questSolver.Solve(odg);
                                 if (b == true) {
                                     final Place pit = questSolver.getPitanje();
+                                    resenaPitanja.remove(marker);
                                     if (pit == null) {
 
                                         updateMarker(marker,true);
@@ -632,16 +725,22 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
 
                                             }
                                         }).start();
-                                        if(pit.getId() == quest.size())
-                                            map.addMarker(new MarkerOptions()
+                                        if(pit.getId() == quest.size()) {
+                                            Marker mark = map.addMarker(new MarkerOptions()
                                                     .position(new LatLng(pit.getLat(), pit.getLng()))
-                                                    .title(pit.getPitanje()))
-                                                    .setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_finishno));
-                                        else
-                                            map.addMarker(new MarkerOptions()
+                                                    .title(pit.getPitanje()));
+                                            mark.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_finishno));
+
+                                            resenaPitanja.put(mark, false);
+                                        }
+                                        else {
+                                            Marker mark = map.addMarker(new MarkerOptions()
                                                     .position(new LatLng(pit.getLat(), pit.getLng()))
-                                                    .title(pit.getPitanje()))
-                                                    .setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_monno));
+                                                    .title(pit.getPitanje()));
+                                            mark.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_monno));
+
+                                            resenaPitanja.put(mark, false);
+                                        }
 
                                         LatLng latLng = new LatLng(pit.getLat(),pit.getLng());
                                         map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
@@ -675,18 +774,16 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                                         } else {
                                             AlertDialog.Builder builder2 = new AlertDialog.Builder(MapActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
                                             builder2.setTitle("Izaberi prijatelja");
-                                            String [] imenaPrijatelja = new String [onlinePrijatelji.size()];
-                                            for(int i = 0; i < onlinePrijatelji.size(); i++)
-                                            {
+                                            String[] imenaPrijatelja = new String[onlinePrijatelji.size()];
+                                            for (int i = 0; i < onlinePrijatelji.size(); i++) {
                                                 imenaPrijatelja[i] = onlinePrijatelji.get(i).getUser();
                                             }
                                             builder2.setItems(imenaPrijatelja, new DialogInterface.OnClickListener() {
                                                 @Override
-                                                public void onClick(DialogInterface dialog, int which)
-                                                {
-                                                    Toast.makeText(getApplicationContext(),onlinePrijatelji.get(which).getUser(),
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    Toast.makeText(getApplicationContext(), onlinePrijatelji.get(which).getUser(),
                                                             Toast.LENGTH_SHORT).show();
-                                                    pitajPrijatelja(onlinePrijatelji.get(which),marker);
+                                                    pitajPrijatelja(onlinePrijatelji.get(which), marker);
                                                 }
                                             });
 
@@ -719,12 +816,18 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
         marker.remove();
 
         LatLng latLng = new LatLng(lat,lon);
-        if(!cilj)
-            map.addMarker(new MarkerOptions().position(latLng)
-                    .title(title)).setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_monyes));
-        else
-            map.addMarker(new MarkerOptions().position(latLng)
-                    .title(title)).setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_finishyes));
+        if(!cilj) {
+            Marker marker1 = map.addMarker(new MarkerOptions().position(latLng)
+                    .title(title));
+            marker1.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_monyes));
+            resenaPitanja.put(marker1,true);
+        }
+        else {
+            Marker marker1 = map.addMarker(new MarkerOptions().position(latLng)
+                    .title(title));
+            marker1.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_monyes));
+            resenaPitanja.put(marker1, true);
+        }
 
 
     }
@@ -861,6 +964,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                                 public void onClick(DialogInterface dialog, int which) {
                                     boolean b = questSolver.Solve(odgovor);
                                     if (b == true) {
+                                        resenaPitanja.remove(marker);
                                         final Place pit = questSolver.getPitanje();
                                         if (pit == null) {
                                             updateMarker(marker, true);
@@ -916,16 +1020,21 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
 
                                                 }
                                             }).start();
-                                            if (pit.getId() == quest.size())
-                                                map.addMarker(new MarkerOptions()
+                                            if (pit.getId() == quest.size()) {
+
+                                                Marker mar = map.addMarker(new MarkerOptions()
                                                         .position(new LatLng(pit.getLat(), pit.getLng()))
-                                                        .title(pit.getPitanje()))
-                                                        .setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_finishno));
-                                            else
-                                                map.addMarker(new MarkerOptions()
+                                                        .title(pit.getPitanje()));
+                                                mar.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_finishno));
+                                                resenaPitanja.put(mar,false);
+                                            }
+                                            else {
+                                                Marker mar = map.addMarker(new MarkerOptions()
                                                         .position(new LatLng(pit.getLat(), pit.getLng()))
-                                                        .title(pit.getPitanje()))
-                                                        .setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_monno));
+                                                        .title(pit.getPitanje()));
+                                                mar.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_monno));
+                                                resenaPitanja.put(mar, false);
+                                            }
 
                                             LatLng latLng = new LatLng(pit.getLat(),pit.getLng());
                                             map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
