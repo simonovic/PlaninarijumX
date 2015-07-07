@@ -59,4 +59,5 @@
     <string name="title_activity_quests">Kvizovi</string>
     <string name="title_activity_ranking">Rang lista</string>
     <string name="ask_friend">Pitaj prijatelja</string>
+    <string name="finish">Cilj</string>
 </resources>
