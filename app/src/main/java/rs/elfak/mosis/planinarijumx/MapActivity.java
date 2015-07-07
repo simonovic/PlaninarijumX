@@ -83,24 +83,22 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
     private ArrayList<OnlinePrijatelj> onlineFriends;
     private ArrayList<Mesto> placesInRadius;
     private ArrayList<OsobaRadiQuest> usersQuests;
+    private int markerMestoID;
+    private Quest qst;
+    private Planina pln;
     private HashMap<Marker, Boolean> resenaPitanja;
-
-
-
+    private HashMap<Marker, Integer> simonHash;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
-        mNavigationDrawerFragment = (NavigationDrawerFragment)
-                getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
+        mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
 
         DrawerLayout mDrawerLayout= (DrawerLayout) findViewById(R.id.drawer_layout);
 
         mDrawerLayout.closeDrawers();
-
-
 
         mTitle = getTitle();
 
@@ -114,6 +112,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
             map.setMyLocationEnabled(true);
 
         resenaPitanja = new HashMap<>();
+        simonHash = new HashMap<>();
 
         Intent i = getIntent();
         planinaID = i.getIntExtra("planinaID",-3);
@@ -161,7 +160,6 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
             mNavigationDrawerFragment.selectItem(4);
         }
         return;
-
     }
 
     private void prikaziQuest()
@@ -175,7 +173,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                             title(("Cilj")));
 
                     marker.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_monno));
-                    resenaPitanja.put(marker,false);
+                    resenaPitanja.put(marker, false);
                 }
                 else
                 {
@@ -295,7 +293,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                             public void run() {
                                 try {
 
-                                    String request = "15\n" + LogActivity.userID + "\n" + MainActivity.MyLocation.latitude + "\n" + MainActivity.MyLocation.longitude + "\n" + 10000000 + "\n";
+                                    String request = "15\n" + LogActivity.userID + "\n" + MainActivity.MyLocation.latitude + "\n" + MainActivity.MyLocation.longitude + "\n" + 9000 + "\n";
                                     InetAddress adr = InetAddress.getByName(Constants.address);
                                     Socket socket = new Socket(adr, Constants.PORT);
                                     PrintWriter printWriter = new PrintWriter(socket.getOutputStream(),true);
@@ -322,7 +320,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
 
                                             for (int i = 0; i < onlineFriends.size(); i++) {
                                                 LatLng latLng = new LatLng(onlineFriends.get(i).getLat(), onlineFriends.get(i).getLon());
-                                                map.addMarker(new MarkerOptions().position(latLng).title("user").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_user)));
+                                                map.addMarker(new MarkerOptions().position(latLng).title(onlineFriends.get(i).getUser()).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_user)));
                                             }
 
                                             int pom;
@@ -347,7 +345,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
 
                                                 if (bingo)
                                                 {
-                                                    if (placesInRadius.get(i).getRedBroj() < ddd)
+                                                    if ((ddd == 0) || (placesInRadius.get(i).getRedBroj() < ddd))
                                                         pom = R.mipmap.ic_monyes;
                                                     else
                                                         pom = R.mipmap.ic_monno;
@@ -356,18 +354,90 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                                                     pom = R.mipmap.ic_monnoq;
 
                                                 LatLng latLng = new LatLng(placesInRadius.get(i).getLat(), placesInRadius.get(i).getLon());
-                                                map.addMarker(new MarkerOptions().position(latLng).title("" + mestoQID).icon(BitmapDescriptorFactory.fromResource(pom)));
+                                                Marker marker = map.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.fromResource(pom)));
+                                                simonHash.put(marker, mestoQID);
                                             }
 
-                                            CircleOptions circleOptions = new CircleOptions().center(MainActivity.MyLocation).radius(100).fillColor(0x4033B5E5).strokeColor(0x00000000);//51 181 229
+                                            CircleOptions circleOptions = new CircleOptions().center(MainActivity.MyLocation).radius(radius).fillColor(0x4033B5E5).strokeColor(0x00000000);//51 181 229
                                             map.addCircle(circleOptions);
 
                                             map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                                                 @Override
-                                                public boolean onMarkerClick(Marker marker)
-                                                {
-                                                    Toast.makeText(MapActivity.this, "Klik na moj marker!", Toast.LENGTH_LONG).show();
+                                                public boolean onMarkerClick(final Marker marker) {
+                                                    if(simonHash.containsKey(marker)) {
+                                                        new Thread(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                               try
+                                                               {
+                                                                   String request = "16\n" + simonHash.get(marker) + "\n";
+                                                                   InetAddress adr = InetAddress.getByName(Constants.address);
+                                                                   Socket socket = new Socket(adr, Constants.PORT);
+                                                                   PrintWriter printWriter = new PrintWriter(socket.getOutputStream(),true);
+                                                                   printWriter.write(request);
+                                                                   printWriter.flush();
+
+                                                                   BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                                                                   String response = in.readLine();
+                                                                   Gson gson = new GsonBuilder().serializeNulls().create();
+                                                                   qst = gson.fromJson(response, Quest.class);
+                                                                   response = in.readLine();
+                                                                   pln = gson.fromJson(response, Planina.class);
+
+                                                                   runOnUiThread(new Runnable() {
+                                                                       @Override
+                                                                       public void run() {
+                                                                            marker.setTitle("Kviz: " + qst.getIme());
+                                                                            marker.setSnippet("Planina: " + pln.getIme());
+                                                                       }
+                                                                   });
+                                                               }
+                                                               catch (Exception e) {
+                                                                    e.printStackTrace();
+                                                               }
+                                                            }
+                                                        }).start();
+                                                    }
                                                     return false;
+                                                }
+                                            });
+
+                                            map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                                                @Override
+                                                public void onInfoWindowClick(Marker marker) {
+                                                    if (simonHash.containsKey(marker))
+                                                    {
+                                                        new Thread(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                try {
+                                                                    String sendBuff = "11\n" + LogActivity.userID + "\n" + qst.getId() + "\n";
+                                                                    InetAddress adr = InetAddress.getByName(Constants.address);
+                                                                    Socket socket = new Socket(adr, Constants.PORT);
+                                                                    PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
+                                                                    printWriter.write(sendBuff);
+                                                                    printWriter.flush();
+                                                                    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                                                                    final String info = in.readLine();
+                                                                    final int pozicija = Integer.parseInt(in.readLine());
+                                                                    in.close();
+                                                                    printWriter.close();
+                                                                    socket.close();
+
+                                                                    runOnUiThread(new Runnable() {
+                                                                        @Override
+                                                                        public void run() {
+                                                                            String podaci = qst.getIme() + "\n" + qst.getId() + "\n" + pozicija + "\n" + info;
+                                                                            startZaSimona(podaci);
+                                                                        }
+                                                                    });
+                                                                }
+                                                                catch(Exception e){
+                                                                    e.printStackTrace();
+                                                                }
+                                                            }
+                                                        }).start();
+                                                    }
                                                 }
                                             });
                                         }

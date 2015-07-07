@@ -69,6 +69,15 @@ public class MyProfileActivity extends Activity
 
         if (savedInstanceState == null)
         {
+            korisnik = null;
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if(korisnik == null)
+        {
             new Thread(new Runnable() {
                 @Override
                 public void run() {

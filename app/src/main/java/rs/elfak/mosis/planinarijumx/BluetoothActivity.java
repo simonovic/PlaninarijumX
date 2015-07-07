@@ -24,11 +24,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.os.Handler;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -36,13 +31,10 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
 
 
 public class BluetoothActivity extends Activity
 {
-    private static final String TAG = "BluetoothActivity";
     private BluetoothAdapter mBtAdapter;
     private ArrayAdapter<String> mNewDevicesArrayAdapter;
     private ListView detDevices;
@@ -74,9 +66,7 @@ public class BluetoothActivity extends Activity
             friendsID = extras.getString("friendsID");
         }
         else
-        {
             friendsID = savedInstanceState.getString(STATE_FRIENDIDS);
-        }
 
         friendsIDs1 = friendsID.split(" ");
 
@@ -110,7 +100,6 @@ public class BluetoothActivity extends Activity
         this.registerReceiver(mReceiver, filter);
         detectBtn = (Button)findViewById(R.id.detectBtn);
         detDevices.setVisibility(View.GONE);
-
         shPref = getSharedPreferences(Constants.loginpref, Context.MODE_PRIVATE);
         userID = shPref.getInt(Constants.userIDpref, 0);
     }
@@ -294,9 +283,9 @@ public class BluetoothActivity extends Activity
                         Toast.makeText(BluetoothActivity.this, "Spijateljavanje sa " + tmp[1] + " nije uspelo!", Toast.LENGTH_LONG).show();
                     }
                     break;
-                case 5:
+                /*case 5:
                     Toast.makeText(BluetoothActivity.this, "Konekcija je neuspela, pokušajte ponovo!", Toast.LENGTH_LONG).show();
-                    break;
+                    break;*/
             }
         }
     };

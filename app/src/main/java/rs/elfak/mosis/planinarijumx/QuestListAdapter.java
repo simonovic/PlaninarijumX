@@ -15,15 +15,15 @@ public class QuestListAdapter extends ArrayAdapter<String>
 {
     private final Context context;
     private final String[] name;
-    private final String[] status;
+    //private final String[] status;
 
-    public QuestListAdapter(Activity context, String[] name, String[] status)
+    public QuestListAdapter(Activity context, String[] name/*, String[] status*/)
     {
         super(context, R.layout.list_quest_item, name);
 
         this.context = context;
         this.name = name;
-        this.status = status;
+        //this.status = status;
     }
 
     public View getView(int position, View view, ViewGroup parent)
@@ -32,9 +32,9 @@ public class QuestListAdapter extends ArrayAdapter<String>
         View rowView = inflater.inflate(R.layout.list_quest_item, null, true);
 
         TextView nameText = (TextView) rowView.findViewById(R.id.questName);
-        TextView statusText = (TextView) rowView.findViewById(R.id.questStatus);
+        //TextView statusText = (TextView) rowView.findViewById(R.id.questStatus);
         nameText.setText(name[position]);
-        statusText.setText(status[position]);
+        //statusText.setText(status[position]);
 
         return rowView;
     };
