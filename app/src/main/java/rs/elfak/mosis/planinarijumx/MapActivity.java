@@ -16,6 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -52,6 +53,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Random;
 import java.util.StringTokenizer;
 
@@ -73,6 +75,9 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
     private ArrayList<Place> fakeQuest;
     private int planinaID;
     private QuestSolver questSolver = null;
+    private ArrayList<OnlinePrijatelj> onlineFriends;
+    private ArrayList<NovoMesto> placesInRadius;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -200,25 +205,63 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
             case 2:
                 mTitle = getString(R.string.title_section2);
                 AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this, AlertDialog.THEME_DEVICE_DEFAULT_LIGHT);
-                builder.setMessage("Poruka").setTitle("Izaberi radius u metrima");
+                builder.setMessage("Poruka").setTitle("Izaberite radjius");
                 final NumberPicker picker = new NumberPicker(MapActivity.this);
-
                 picker.setMinValue(1);
                 picker.setMaxValue(10000);
                 builder.setView(picker);
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        Toast.makeText(getApplicationContext(), "Idi do servera" + picker.getValue() , Toast.LENGTH_SHORT).show();
-                        CircleOptions circleOptions = new CircleOptions().center(MainActivity.MyLocation).
-                                radius(picker.getValue()).fillColor(0x4033B5E5).strokeColor(0x00000000);//51 181 229
-                        map.addCircle(circleOptions);
+
+                        final int radius = picker.getValue();
+
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+
+                                    String request = "15\n" + LogActivity.userID + "\n" + MainActivity.MyLocation.latitude + "\n" + MainActivity.MyLocation.longitude + "\n" + radius + "\n";
+                                    InetAddress adr = InetAddress.getByName(Constants.address);
+                                    Socket socket = new Socket(adr, Constants.PORT);
+                                    PrintWriter printWriter = new PrintWriter(socket.getOutputStream(),true);
+                                    printWriter.write(request);
+                                    printWriter.flush();
+
+                                    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                                    String response = in.readLine();
+                                    Gson gson = new GsonBuilder().serializeNulls().create();
+                                    onlineFriends = gson.fromJson(response, new TypeToken<ArrayList<OnlinePrijatelj>>() {}.getType());
+
+                                    printWriter.close();
+                                    socket.close();
+
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+
+                                            for(int i = 0 ; i < onlineFriends.size(); i++)
+                                            {
+                                                LatLng latLng = new LatLng(onlineFriends.get(i).getLat(),onlineFriends.get(i).getLon());
+                                                map.addMarker(new MarkerOptions().position(latLng).title((onlineFriends.get(i).getUser())));
+                                            }
+
+                                            CircleOptions circleOptions = new CircleOptions().center(MainActivity.MyLocation).radius(radius).fillColor(0x4033B5E5).strokeColor(0x00000000);//51 181 229
+                                            map.addCircle(circleOptions);
+                                        }
+                                    });
+
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }).start();
                     }
                 });
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                builder.setNegativeButton("Otkaži", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        Toast.makeText(getApplicationContext(), "Odustao si", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getApplicationContext(), "Odustao si", Toast.LENGTH_SHORT).show();
                     }
                 });
                 AlertDialog alertDialog = builder.create();
@@ -291,8 +334,8 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                                                 editText = (EditText) view.findViewById(R.id.add_answer);
                                                 String a = editText.getText().toString();
 
-                                                /*Place place = new Place(latLng.latitude, latLng.longitude, a, q,-1);
-                                                quest.add(place);*/
+                                                Place place = new Place(latLng.latitude, latLng.longitude, a, q,-1);
+                                                quest.add(place);
                                                 map.addMarker(new MarkerOptions().position(latLng).title(q));
                                             }
                                         })
