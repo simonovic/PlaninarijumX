@@ -104,13 +104,6 @@ public class RankingActivity extends Activity
                             usersAdapter = new RankListAdapter(RankingActivity.this, userRank, userName, userPoints);
                             userListView = (ListView) findViewById(R.id.ranking);
                             userListView.setAdapter(usersAdapter);
-
-                            userListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                                @Override
-                                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                    Toast.makeText(getApplicationContext(), userName[position], Toast.LENGTH_LONG).show();
-                                }
-                            });
                         }
                     });
 
@@ -126,18 +119,4 @@ public class RankingActivity extends Activity
         super.onResume();
         LogActivity.trenutnaAktivnost = this;
     }
-
-    private AdapterView.OnItemClickListener osobaClickListener = new AdapterView.OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-        {
-            Gson gson = new GsonBuilder().serializeNulls().create();
-            OsobaReducedPlus q = usersList.get(position);
-            String plString = gson.toJson(q);
-            Intent i = new Intent(RankingActivity.this, PlaninaActivity.class);
-            i.putExtra("quest", plString);
-            //startActivity(i);
-            Toast.makeText(getApplicationContext(), "Klik na korisnika!", Toast.LENGTH_LONG).show();
-        }
-    };
 }

@@ -427,9 +427,9 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                         for(int i = 0; i < quest.size(); i++)
                         {
                             Place p = quest.get(i);
-                            /*NovoMesto novoMesto = new NovoMesto(-1,p.getPitanje(),p.getOdgovor(),p.getLat(),p.getLng(),p.getId());
+                            NovoMesto novoMesto = new NovoMesto(-1,p.getPitanje(),p.getOdgovor(),p.getLat(),p.getLng(),p.getId());
                             sendBuf = novoMesto.toString() + "\n";
-                            printWriter.write(sendBuf);*/
+                            printWriter.write(sendBuf);
                         }
                         printWriter.flush();
                         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -470,7 +470,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                 }
             }).start();
 
-        }/*else if(id == R.id.start_quest)
+        }else if(id == R.id.start_quest)
         {
             if(!questSolver.isZapocet()) {
                 map.clear();
@@ -571,7 +571,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                 });
 
             }
-        }*/
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -592,7 +592,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
         new Thread(new Runnable() {
             @Override
             public void run() {
-                /*String adresa = onlinePrijatelj.getIp().substring(1);
+                String adresa = onlinePrijatelj.getIp().substring(1);
                 StringTokenizer tokeni = new StringTokenizer(adresa, ":");
                 adresa = tokeni.nextToken();
                 String sendBuf = pitanje + "\n" +
@@ -654,7 +654,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                     e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
-                }*/
+                }
             }
         }).start();
     }
