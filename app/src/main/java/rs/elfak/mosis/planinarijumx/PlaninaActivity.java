@@ -70,6 +70,7 @@ public class PlaninaActivity extends Activity
                             for (Iterator<Quest> i = questList.iterator(); i.hasNext(); ) {
                                 Quest q = i.next();
                                 questAdapter.add(br+".  "+q.getIme());
+                                br++;
                             }
                             ListView plListView = (ListView) findViewById(R.id.questListView);
                             plListView.setAdapter(questAdapter);
