@@ -100,7 +100,7 @@ public class PlaninaActivity extends Activity
 
         if (id == R.id.action_dodaj_kviz_na_planini)
         {
-            Intent i = new Intent(this,MapActivity.class);
+            Intent i = new Intent(this, MapActivity.class);
             i.putExtra("planinaID",pl.getId());
             startActivity(i);
         }
@@ -110,8 +110,6 @@ public class PlaninaActivity extends Activity
         }
         return super.onOptionsItemSelected(item);
     }
-
-
 
     private AdapterView.OnItemClickListener questClickListener = new AdapterView.OnItemClickListener() {
         @Override
@@ -154,7 +152,6 @@ public class PlaninaActivity extends Activity
                     }
                 }
             }).start();
-
         }
     };
 }
