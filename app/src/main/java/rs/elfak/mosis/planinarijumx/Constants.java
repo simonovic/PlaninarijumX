@@ -13,4 +13,17 @@ public class Constants
     public static final int PORT = 4000;
     public static final int FRIENDPORT = 4001;
     public static final int perioda = 10000;
+    public static final int udaljenost = 100;
+
+    public static double calcDistance(double lat1, double long1, double lat2, double long2)
+    {
+        double a, c;
+
+        a = Math.sin((lat2 - lat1)*Math.PI/360) * Math.sin((lat2 - lat1)*Math.PI/360) +
+                Math.sin((long2 - long1)*Math.PI/360) * Math.sin((long2 - long1)*Math.PI/360) * Math.cos(lat2 * Math.PI/180) * Math.cos(lat1 * Math.PI/180);
+
+        c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return 6371000 * c;
+    }
 }

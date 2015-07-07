@@ -33,7 +33,6 @@ public class QuestSolver
         for(int i = 0; i < quest.size(); i++)
             if(position == quest.get(i).getId())
             {
-                System.out.println(quest.get(i).getOdgovor());
                 if(odg.equals(quest.get(i).getOdgovor()))
                 {
                     position++;

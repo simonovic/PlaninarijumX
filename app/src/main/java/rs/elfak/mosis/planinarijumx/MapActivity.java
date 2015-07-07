@@ -387,6 +387,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                     }
                 });
                 AlertDialog alertDialog = builder.create();
+                alertDialog.setCanceledOnTouchOutside(false);
                 alertDialog.show();
                 break;
             case 3:
@@ -457,6 +458,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                                         });
 
                                         AlertDialog alertDialog = builder2.create();
+                                        alertDialog.setCanceledOnTouchOutside(false);
                                         alertDialog.show();
                                     }
                                 });
@@ -525,6 +527,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                                         });
 
                                         AlertDialog alertDialog = builder2.create();
+                                        alertDialog.setCanceledOnTouchOutside(false);
                                         alertDialog.show();
                                     }
                                 });
@@ -550,6 +553,8 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
             {
                 String info = data.getStringExtra("questInfo");
                 if(info != null) {
+
+                    invalidateOptionsMenu();
                     startZaSimona(info, 3);
                     prikaziQuest();
                 }
@@ -613,6 +618,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                                     }
                                 });
                         AlertDialog alertDialog = builder.create();
+                        alertDialog.setCanceledOnTouchOutside(false);
                         alertDialog.show();
 
                     }
@@ -643,8 +649,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
             {
                 getMenuInflater().inflate(R.menu.kviz_menu,menu);
             }
-            else
-                getMenuInflater().inflate(R.menu.map, menu);
+
             restoreActionBar();
             return true;
         }
@@ -737,6 +742,14 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
         map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(final Marker marker) {
+                if(Constants.calcDistance(marker.getPosition().latitude,marker.getPosition().longitude,
+                        MainActivity.MyLocation.latitude,MainActivity.MyLocation.longitude)
+                        > Constants.udaljenost)
+                {
+                    Toast.makeText(getApplicationContext(), "Previse si udaljen da bi odgovorio na ovo pitanje",
+                            Toast.LENGTH_SHORT).show();
+                    return true;
+                }
                 if(resenaPitanja.containsKey(marker))
                     if(resenaPitanja.get(marker)) {
                         Toast.makeText(getApplicationContext(), "Vec si resio ovo pitanje", Toast.LENGTH_SHORT).show();
@@ -876,6 +889,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                                             });
 
                                             AlertDialog alertDialog = builder2.create();
+                                            alertDialog.setCanceledOnTouchOutside(false);
                                             alertDialog.show();
                                         }
 
@@ -886,6 +900,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                     }
                 });
                 AlertDialog alertDialog = builder.create();
+                alertDialog.setCanceledOnTouchOutside(false);
                 alertDialog.show();
 
                 return true;

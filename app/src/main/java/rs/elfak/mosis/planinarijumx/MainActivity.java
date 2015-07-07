@@ -41,7 +41,7 @@ public class MainActivity extends Activity
 {
     SharedPreferences shPref;
     private static final String request = "5\n";
-    private ArrayList<Planina> planine;
+    private ArrayList<Planina> planine = null;
     private ArrayAdapter<String> planineAdapter;
     private String pl;
     public static LatLng MyLocation =  new LatLng(43.319425, 21.899487);
@@ -62,46 +62,7 @@ public class MainActivity extends Activity
 
         if (savedInstanceState == null)
         {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
 
-                    InetAddress adr = InetAddress.getByName(Constants.address);
-                    Socket socket = new Socket(adr, Constants.PORT);
-                    PrintWriter printWriter = new PrintWriter(socket.getOutputStream(),true);
-                    printWriter.write(request);
-                    printWriter.flush();
-
-                    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    pl = in.readLine();
-                    Gson gson = new GsonBuilder().serializeNulls().create();
-                    planine = gson.fromJson(pl, new TypeToken<ArrayList<Planina>>() {}.getType());
-
-                    printWriter.close();
-                    socket.close();
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                            int br = 1;
-                            planineAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1);
-                            for (Iterator<Planina> i = planine.iterator(); i.hasNext(); ) {
-                                Planina pl = i.next();
-                                planineAdapter.add(br+".  "+pl.getIme());
-                                br++;
-                            }
-                            ListView plListView = (ListView) findViewById(R.id.planinaListView);
-                            plListView.setAdapter(planineAdapter);
-                            plListView.setOnItemClickListener(planinaClickListener);
-                            }
-                        });
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).start();
         }
         else
         {
@@ -276,6 +237,50 @@ public class MainActivity extends Activity
 
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, Constants.perioda, 0, listener);
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, Constants.perioda, 0, listener);
+        }
+
+        if((planine == null))
+        {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+
+                        InetAddress adr = InetAddress.getByName(Constants.address);
+                        Socket socket = new Socket(adr, Constants.PORT);
+                        PrintWriter printWriter = new PrintWriter(socket.getOutputStream(),true);
+                        printWriter.write(request);
+                        printWriter.flush();
+
+                        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                        pl = in.readLine();
+                        Gson gson = new GsonBuilder().serializeNulls().create();
+                        planine = gson.fromJson(pl, new TypeToken<ArrayList<Planina>>() {}.getType());
+
+                        printWriter.close();
+                        socket.close();
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                int br = 1;
+                                planineAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1);
+                                for (Iterator<Planina> i = planine.iterator(); i.hasNext(); ) {
+                                    Planina pl = i.next();
+                                    planineAdapter.add(br+".  "+pl.getIme());
+                                    br++;
+                                }
+                                ListView plListView = (ListView) findViewById(R.id.planinaListView);
+                                plListView.setAdapter(planineAdapter);
+                                plListView.setOnItemClickListener(planinaClickListener);
+                            }
+                        });
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
         }
     }
 

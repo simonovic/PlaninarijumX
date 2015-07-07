@@ -9,6 +9,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -28,7 +30,7 @@ import java.util.Map;
 public class PlaninaActivity extends Activity
 {
     private static Planina pl;
-    private ArrayList<Quest> questList;
+    private ArrayList<Quest> questList = null;
     private ArrayAdapter<String> questAdapter;
     int code = 0;
 
@@ -44,46 +46,55 @@ public class PlaninaActivity extends Activity
         Gson gson = new GsonBuilder().serializeNulls().create();
         pl = gson.fromJson(plString, Planina.class);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                        String request = "9\n"+pl.getId()+"\n";
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if(questList == null) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        String request = "9\n" + pl.getId() + "\n";
                         InetAddress adr = InetAddress.getByName(Constants.address);
                         Socket socket = new Socket(adr, Constants.PORT);
-                        PrintWriter printWriter = new PrintWriter(socket.getOutputStream(),true);
+                        PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
                         printWriter.write(request);
                         printWriter.flush();
 
                         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                         String serverResponse = in.readLine();
                         Gson gson = new GsonBuilder().serializeNulls().create();
-                        questList = gson.fromJson(serverResponse, new TypeToken<ArrayList<Quest>>() {}.getType());
+                        questList = gson.fromJson(serverResponse, new TypeToken<ArrayList<Quest>>() {
+                        }.getType());
 
                         printWriter.close();
                         socket.close();
 
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            setTitle(pl.getIme());
-                            questAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1);
-                            int br = 1;
-                            for (Iterator<Quest> i = questList.iterator(); i.hasNext(); ) {
-                                Quest q = i.next();
-                                questAdapter.add(br+".  "+q.getIme());
-                                br++;
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                setTitle(pl.getIme());
+                                questAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1);
+                                int br = 1;
+                                for (Iterator<Quest> i = questList.iterator(); i.hasNext(); ) {
+                                    Quest q = i.next();
+                                    questAdapter.add(br + ".  " + q.getIme());
+                                    br++;
+                                }
+                                ListView plListView = (ListView) findViewById(R.id.questListView);
+                                plListView.setAdapter(questAdapter);
+                                plListView.setOnItemClickListener(questClickListener);
                             }
-                            ListView plListView = (ListView) findViewById(R.id.questListView);
-                            plListView.setAdapter(questAdapter);
-                            plListView.setOnItemClickListener(questClickListener);
-                        }
-                    });
+                        });
 
-                }
-                catch (IOException e) { e.printStackTrace(); }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }).start();
+        }
     }
 
     @Override
@@ -141,17 +152,30 @@ public class PlaninaActivity extends Activity
                             @Override
                             public void run() {
                                 if(code != 3) {
-                                    Intent i = new Intent(getApplication(), MapActivity.class);
-                                    String podaci = q.getIme() + "\n" + q.getId() + "\n" + pozicija + "\n" + info;
-                                    i.putExtra("questInfo", podaci);
-                                    startActivity(i);
+                                    if(q.getOsoba_id() == LogActivity.userID)
+                                    {
+                                        Toast.makeText(getApplicationContext(),
+                                                getString(R.string.cant_start_quest), Toast.LENGTH_SHORT).show();
+                                    }else {
+                                        Intent i = new Intent(getApplication(), MapActivity.class);
+                                        String podaci = q.getIme() + "\n" + q.getId() + "\n" + pozicija + "\n" + info;
+                                        i.putExtra("questInfo", podaci);
+                                        startActivity(i);
+                                    }
                                 }else
                                 {
-                                    Intent returnIntent = new Intent();
-                                    String podaci = q.getIme() + "\n" + q.getId() + "\n" + pozicija + "\n" + info;
-                                    returnIntent.putExtra("questInfo",podaci);
-                                    setResult(RESULT_OK,returnIntent);
-                                    finish();
+                                    if(q.getOsoba_id() == LogActivity.userID)
+                                    {
+                                        Toast.makeText(getApplicationContext(),
+                                                getString(R.string.cant_start_quest), Toast.LENGTH_SHORT).show();
+
+                                    }else {
+                                        Intent returnIntent = new Intent();
+                                        String podaci = q.getIme() + "\n" + q.getId() + "\n" + pozicija + "\n" + info;
+                                        returnIntent.putExtra("questInfo", podaci);
+                                        setResult(RESULT_OK, returnIntent);
+                                        finish();
+                                    }
                                 }
                             }
                         });
