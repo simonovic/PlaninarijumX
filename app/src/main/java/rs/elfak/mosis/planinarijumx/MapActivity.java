@@ -170,7 +170,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                 LatLng latLng = new LatLng(quest.get(i).getLat(), quest.get(i).getLng());
                 if(quest.get(i).getId() != quest.size()) {
                     Marker marker = map.addMarker(new MarkerOptions().position(latLng).
-                            title(("Cilj")));
+                            title((quest.get(i).getId()) + ". " + getString(R.string.question)));
 
                     marker.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_monno));
                     resenaPitanja.put(marker, false);
@@ -178,7 +178,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                 else
                 {
                     Marker marker = map.addMarker(new MarkerOptions().position(latLng).
-                            title((quest.get(i).getId()) + ". " + getString(R.string.question)));
+                            title("Cilj"));
 
                     marker.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_finishno));
                     resenaPitanja.put(marker, false);
@@ -364,37 +364,35 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                                             map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                                                 @Override
                                                 public boolean onMarkerClick(final Marker marker) {
-                                                    if(simonHash.containsKey(marker)) {
+                                                    if (simonHash.containsKey(marker)) {
                                                         new Thread(new Runnable() {
                                                             @Override
                                                             public void run() {
-                                                               try
-                                                               {
-                                                                   String request = "16\n" + simonHash.get(marker) + "\n";
-                                                                   InetAddress adr = InetAddress.getByName(Constants.address);
-                                                                   Socket socket = new Socket(adr, Constants.PORT);
-                                                                   PrintWriter printWriter = new PrintWriter(socket.getOutputStream(),true);
-                                                                   printWriter.write(request);
-                                                                   printWriter.flush();
+                                                                try {
+                                                                    String request = "16\n" + simonHash.get(marker) + "\n";
+                                                                    InetAddress adr = InetAddress.getByName(Constants.address);
+                                                                    Socket socket = new Socket(adr, Constants.PORT);
+                                                                    PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
+                                                                    printWriter.write(request);
+                                                                    printWriter.flush();
 
-                                                                   BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                                                                   String response = in.readLine();
-                                                                   Gson gson = new GsonBuilder().serializeNulls().create();
-                                                                   qst = gson.fromJson(response, Quest.class);
-                                                                   response = in.readLine();
-                                                                   pln = gson.fromJson(response, Planina.class);
+                                                                    BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                                                                    String response = in.readLine();
+                                                                    Gson gson = new GsonBuilder().serializeNulls().create();
+                                                                    qst = gson.fromJson(response, Quest.class);
+                                                                    response = in.readLine();
+                                                                    pln = gson.fromJson(response, Planina.class);
 
-                                                                   runOnUiThread(new Runnable() {
-                                                                       @Override
-                                                                       public void run() {
+                                                                    runOnUiThread(new Runnable() {
+                                                                        @Override
+                                                                        public void run() {
                                                                             marker.setTitle("Kviz: " + qst.getIme());
                                                                             marker.setSnippet("Planina: " + pln.getIme());
-                                                                       }
-                                                                   });
-                                                               }
-                                                               catch (Exception e) {
+                                                                        }
+                                                                    });
+                                                                } catch (Exception e) {
                                                                     e.printStackTrace();
-                                                               }
+                                                                }
                                                             }
                                                         }).start();
                                                     }
@@ -405,8 +403,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                                             map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
                                                 @Override
                                                 public void onInfoWindowClick(Marker marker) {
-                                                    if (simonHash.containsKey(marker))
-                                                    {
+                                                    if (simonHash.containsKey(marker)) {
                                                         new Thread(new Runnable() {
                                                             @Override
                                                             public void run() {
@@ -428,11 +425,10 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                                                                         @Override
                                                                         public void run() {
                                                                             String podaci = qst.getIme() + "\n" + qst.getId() + "\n" + pozicija + "\n" + info;
-                                                                            startZaSimona(podaci,4);
+                                                                            startZaSimona(podaci, 4);
                                                                         }
                                                                     });
-                                                                }
-                                                                catch(Exception e){
+                                                                } catch (Exception e) {
                                                                     e.printStackTrace();
                                                                 }
                                                             }

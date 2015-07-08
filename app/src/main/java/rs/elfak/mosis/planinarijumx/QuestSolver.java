@@ -26,8 +26,7 @@ public class QuestSolver
     {
         if(odg == null)
             return false;
-        //if(odg.equals(""))
-        //    return false;
+
         System.out.println("uneo si"+odg);
 
         for(int i = 0; i < quest.size(); i++)

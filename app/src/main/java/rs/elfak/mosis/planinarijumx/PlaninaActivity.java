@@ -150,6 +150,7 @@ public class PlaninaActivity extends Activity
                             @Override
                             public void run() {
                                 if(code != 3) {
+                                    String vlasnik = "false";
                                     if(q.getOsoba_id() == LogActivity.userID)
                                     {
                                         Toast.makeText(getApplicationContext(),
@@ -164,8 +165,7 @@ public class PlaninaActivity extends Activity
                                 {
                                     if(q.getOsoba_id() == LogActivity.userID)
                                     {
-                                        Toast.makeText(getApplicationContext(),
-                                                getString(R.string.cant_start_quest), Toast.LENGTH_SHORT).show();
+
 
                                     }else {
                                         Intent returnIntent = new Intent();
