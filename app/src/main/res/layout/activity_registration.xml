@@ -101,7 +101,7 @@
         style="?android:attr/buttonStyleSmall"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/slika"
+        android:text="@string/finish"
         android:id="@+id/registruj_se"
         android:layout_marginTop="10dp"
         android:onClick="registrujMe"/>

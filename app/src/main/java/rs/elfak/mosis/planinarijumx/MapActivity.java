@@ -428,7 +428,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                                                                         @Override
                                                                         public void run() {
                                                                             String podaci = qst.getIme() + "\n" + qst.getId() + "\n" + pozicija + "\n" + info;
-                                                                            startZaSimona(podaci);
+                                                                            startZaSimona(podaci,4);
                                                                         }
                                                                     });
                                                                 }
