@@ -150,30 +150,26 @@ public class PlaninaActivity extends Activity
                             @Override
                             public void run() {
                                 if(code != 3) {
-                                    String vlasnik = "false";
-                                    if(q.getOsoba_id() == LogActivity.userID)
-                                    {
-                                        Toast.makeText(getApplicationContext(),
-                                                getString(R.string.cant_start_quest), Toast.LENGTH_SHORT).show();
-                                    }else {
-                                        Intent i = new Intent(getApplication(), MapActivity.class);
-                                        String podaci = q.getIme() + "\n" + q.getId() + "\n" + pozicija + "\n" + info;
-                                        i.putExtra("questInfo", podaci);
-                                        startActivity(i);
-                                    }
-                                }else
-                                {
-                                    if(q.getOsoba_id() == LogActivity.userID)
-                                    {
+                                    Intent i = new Intent(getApplication(), MapActivity.class);
+                                    String podaci = q.getIme() + "\n" + q.getId() + "\n" + pozicija + "\n" + info;
+                                    i.putExtra("questInfo", podaci);
+                                    if (q.getOsoba_id() == LogActivity.userID)
+                                        i.putExtra("vlasnik", "true");
+                                    else
+                                        i.putExtra("vlasnik", "false");
+                                    startActivity(i);
 
+                                }else {
+                                    Intent returnIntent = new Intent();
+                                    String podaci = q.getIme() + "\n" + q.getId() + "\n" + pozicija + "\n" + info;
+                                    if (q.getOsoba_id() == LogActivity.userID)
+                                        returnIntent.putExtra("vlasnik", "true");
+                                    else
+                                        returnIntent.putExtra("vlasnik", "false");
+                                    returnIntent.putExtra("questInfo", podaci);
+                                    setResult(RESULT_OK, returnIntent);
+                                    finish();
 
-                                    }else {
-                                        Intent returnIntent = new Intent();
-                                        String podaci = q.getIme() + "\n" + q.getId() + "\n" + pozicija + "\n" + info;
-                                        returnIntent.putExtra("questInfo", podaci);
-                                        setResult(RESULT_OK, returnIntent);
-                                        finish();
-                                    }
                                 }
                             }
                         });

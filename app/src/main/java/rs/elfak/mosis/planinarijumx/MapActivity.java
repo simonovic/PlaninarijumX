@@ -42,6 +42,8 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -76,6 +78,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
     private CharSequence mTitle;
     private GoogleMap map;
     private ArrayList<Place> quest;
+    private Polyline polyline;
     private String questName = "";
     private ArrayList<Place> fakeQuest;
     private int planinaID;
@@ -88,6 +91,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
     private Planina pln;
     private HashMap<Marker, Boolean> resenaPitanja;
     private HashMap<Marker, Integer> simonHash;
+    private boolean vlasnik = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,6 +127,15 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
             return;
         }
 
+        String vl = i.getStringExtra("vlasnik");
+        if(vl != null)
+            if(vl.equals("false"))
+                vlasnik = false;
+            else
+                vlasnik = true;
+        else
+            vlasnik = false;
+
         String kvizovi = i.getStringExtra("questInfo");
         if(kvizovi != null) {
             startZaSimona(kvizovi, 2);
@@ -155,6 +168,10 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
         {
             questSolver.setPosition(1);
         }
+        if(vlasnik) {
+            questSolver.setPosition(0);
+            questSolver.setZapocet(true);
+        }
         if(code != 3) {
             mNavigationDrawerFragment.setMenuVisibility(false);
             mNavigationDrawerFragment.selectItem(4);
@@ -164,31 +181,43 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
 
     private void prikaziQuest()
     {
-        if(!questSolver.isZapocet())
-            for(int i = 0 ; i < quest.size(); i++)
-            {
+        if(!questSolver.isZapocet()) {
+            polyline = map.addPolyline(new PolylineOptions().width(4).color(0x700000FF));
+            ArrayList<LatLng> tacke = new ArrayList<>();
+            for (int i = 0; i < quest.size(); i++) {
+
                 LatLng latLng = new LatLng(quest.get(i).getLat(), quest.get(i).getLng());
-                if(quest.get(i).getId() != quest.size()) {
+                tacke.add(latLng);
+                if (quest.get(i).getId() != quest.size()) {
                     Marker marker = map.addMarker(new MarkerOptions().position(latLng).
                             title((quest.get(i).getId()) + ". " + getString(R.string.question)));
 
                     marker.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_monno));
                     resenaPitanja.put(marker, false);
-                }
-                else
-                {
+                } else {
                     Marker marker = map.addMarker(new MarkerOptions().position(latLng).
-                            title("Cilj"));
+                            title(getString(R.string.finish)));
 
                     marker.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_finishno));
                     resenaPitanja.put(marker, false);
                 }
             }
+            polyline.setPoints(tacke);
+
+        }
         else if(questSolver.getPosition() == 0)
         {
+            mTitle = getString(R.string.quest_done) + " : " + questName;
+            if(vlasnik)
+                Toast.makeText(getApplicationContext(),"Ti si kreator kviza", Toast.LENGTH_SHORT).show();
+
+            polyline = map.addPolyline(new PolylineOptions().width(4).color(0x700000FF));
+            ArrayList<LatLng> tacke = new ArrayList<>();
+
             for(int i = 0 ; i < quest.size(); i++)
             {
                 LatLng latLng = new LatLng(quest.get(i).getLat(), quest.get(i).getLng());
+                tacke.add(latLng);
                 if(quest.get(i).getId() != quest.size()) {
                     Marker marker = map.addMarker(new MarkerOptions().position(latLng).
                             title((quest.get(i).getId() + ". " + getString(R.string.question))));
@@ -205,11 +234,15 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                     resenaPitanja.put(marker, true);
                 }
             }
+            polyline.setPoints(tacke);
         }else
         {
+            polyline = map.addPolyline(new PolylineOptions().width(4).color(0x700000FF));
+            ArrayList<LatLng> tacke = new ArrayList<>();
             for(int i = 0; i < quest.size(); i++)
             {
                 LatLng latLng = new LatLng(quest.get(i).getLat(), quest.get(i).getLng());
+                tacke.add(latLng);
                 if(questSolver.getPosition() > quest.get(i).getId()) {
                     Marker marker = map.addMarker(new MarkerOptions().position(latLng).
                             title((quest.size() - quest.get(i).getId()) + ". " + getString(R.string.question)));
@@ -218,6 +251,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                     resenaPitanja.put(marker, true);
                 }
             }
+            polyline.setPoints(tacke);
             radiQuest();
         }
 
@@ -425,6 +459,10 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                                                                         @Override
                                                                         public void run() {
                                                                             String podaci = qst.getIme() + "\n" + qst.getId() + "\n" + pozicija + "\n" + info;
+                                                                            if(LogActivity.userID == qst.getOsoba_id())
+                                                                                vlasnik = true;
+                                                                            else
+                                                                                vlasnik = false;
                                                                             startZaSimona(podaci, 4);
                                                                         }
                                                                     });
@@ -804,7 +842,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
         LatLng latLng = new LatLng(pitanje.getLat(),pitanje.getLng());
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,17));
 
-        Toast.makeText(getApplicationContext(), "Odgovor:" + pitanje.getOdgovor(), Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getApplicationContext(), "Odgovor:" + pitanje.getOdgovor(), Toast.LENGTH_SHORT).show();
         map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(final Marker marker) {
