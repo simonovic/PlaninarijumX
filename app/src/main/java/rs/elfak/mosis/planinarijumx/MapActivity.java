@@ -293,7 +293,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                             public void run() {
                                 try {
 
-                                    String request = "15\n" + LogActivity.userID + "\n" + MainActivity.MyLocation.latitude + "\n" + MainActivity.MyLocation.longitude + "\n" + 9000 + "\n";
+                                    String request = "15\n" + LogActivity.userID + "\n" + MainActivity.MyLocation.latitude + "\n" + MainActivity.MyLocation.longitude + "\n" + radius + "\n";
                                     InetAddress adr = InetAddress.getByName(Constants.address);
                                     Socket socket = new Socket(adr, Constants.PORT);
                                     PrintWriter printWriter = new PrintWriter(socket.getOutputStream(),true);
