@@ -44,7 +44,7 @@ public class RegistrationActivity extends Activity
         setContentView(R.layout.activity_registration);
 
         b = (Button)findViewById(R.id.slikaBtn);
-        viewImage = (ImageView)findViewById(R.id.viewImage);
+        viewImage = (ImageView)findViewById(R.id.imageView);
     }
 
     public void onSlikaBtn(View view)
@@ -169,12 +169,8 @@ public class RegistrationActivity extends Activity
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
-
             }
         }).start();
-
-
     }
 
     @Override
@@ -194,27 +190,34 @@ public class RegistrationActivity extends Activity
             {
                 imageName = getRealPathFromUri(mCapturedImageURI);
                 Bitmap thumbnail = (BitmapFactory.decodeFile(imageName));
-                int nh = (int)(thumbnail.getHeight()*(512.0/thumbnail.getWidth()));
-                Bitmap scaled = Bitmap.createScaledBitmap(thumbnail, 512, nh, true);
+                int nh = (int)(thumbnail.getHeight()*(2048.0/thumbnail.getWidth()));
+                Bitmap scaled = Bitmap.createScaledBitmap(thumbnail, 2048, nh, true);
                 viewImage.setImageBitmap(scaled);
             }
             else if(requestCode == 2)
             {
-                Uri selectedImage = data.getData();
-                //File f = new File("" + selectedImage.getPath());
-                //imageName = f.getName();
-                String[] filePath = { MediaStore.Images.Media.DATA};
-                Cursor c = getContentResolver().query(selectedImage, filePath, null, null, null);
-                c.moveToFirst();
-                int columnIndex = c.getColumnIndex(filePath[0]);
-                String picturePath = c.getString(columnIndex);
-                c.close();
-                Bitmap thumbnail = (BitmapFactory.decodeFile(picturePath));
-                File f = new File(picturePath);
-                imageName = picturePath;
-                int nh = (int)(thumbnail.getHeight()*(512.0/thumbnail.getWidth()));
-                Bitmap scaled = Bitmap.createScaledBitmap(thumbnail, 512, nh, true);
-                viewImage.setImageBitmap(scaled);
+                try {
+                    Uri selectedImage = data.getData();
+                    //File f = new File("" + selectedImage.getPath());
+                    //imageName = f.getName();
+                    String[] filePath = {MediaStore.Images.Media.DATA};
+                    Cursor c = getContentResolver().query(selectedImage, filePath, null, null, null);
+                    c.moveToFirst();
+                    int columnIndex = c.getColumnIndex(filePath[0]);
+                    String picturePath = c.getString(columnIndex);
+                    c.close();
+                    Bitmap thumbnail = (BitmapFactory.decodeFile(picturePath));
+                    File f = new File(picturePath);
+                    imageName = picturePath;
+                    int nh = (int)(thumbnail.getHeight()*(2048.0/thumbnail.getWidth()));
+                    Bitmap scaled = Bitmap.createScaledBitmap(thumbnail, 2048, nh, true);
+                    viewImage.setImageBitmap(scaled);
+                    //.setImageBitmap(thumbnail);
+                }
+                catch (Exception e)
+                {
+                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+                }
             }
         }
     }

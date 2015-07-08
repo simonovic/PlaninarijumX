@@ -77,12 +77,6 @@
         android:phoneNumber="true"
         android:id="@+id/brtel" />
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageView"
-        android:layout_gravity="right" />
-
     <Button
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
@@ -93,9 +87,12 @@
         android:onClick="onSlikaBtn"/>
 
     <ImageView
-        android:id="@+id/viewImage"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:id="@+id/imageView"
+        android:layout_gravity="center"
+        android:adjustViewBounds="true"
+        android:scaleType="fitXY" />
 
     <Button
         style="?android:attr/buttonStyleSmall"

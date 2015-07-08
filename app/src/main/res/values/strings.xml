@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">PlaninarijumX</string>
-
     <string name="title_activity_registration">Registracija</string>
     <string name="kor_ime1">Korisničko ime</string>
     <string name="loz1">Lozinka</string>
@@ -28,24 +27,18 @@
     <string name="vidljiv">Vidljiv</string>
     <string name="ranglista">Rang lista</string>
     <string name="currang">Trenutni rang:</string>
-
-
     <string name="hello_world">Hello world!</string>
     <string name="action_mapa">Mapa</string>
     <string name="title_activity_map">Map Activity</string>
-
     <string name="title_section1">Prikaži moju lokaciju</string>
     <string name="title_section2">Mesta u blizini</string>
     <string name="title_section3">Prikazi prijatelje</string>
     <string name="title_section4">Dodaj kviz</string>
     <string name="title_section5">Reši kviz</string>
     <string name="empty_space">Popuni prazna mesta</string>
-
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-
     <string name="action_example">Example action</string>
-
     <string name="action_settings">Settings</string>
     <string name="title_activity_friend_request">Prijateljstvo</string>
     <string name="add_place">Dodaj mesto</string>

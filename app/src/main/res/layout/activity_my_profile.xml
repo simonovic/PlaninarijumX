@@ -15,10 +15,19 @@
         android:layout_height="match_parent"
         android:orientation="vertical" >
 
-        <ImageView
+        <!-- <ImageView
             android:id="@+id/viewImage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:src="@mipmap/ic_profile" /> -->
+
+        <ImageView
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:id="@+id/viewImage"
+            android:layout_gravity="center"
+            android:adjustViewBounds="true"
+            android:scaleType="fitXY"
             android:src="@mipmap/ic_profile" />
 
         <TextView android:text="@string/ime"
@@ -93,12 +102,6 @@
             android:layout_marginLeft="160dp"
             android:textSize="20dp"
             android:layout_marginTop="-33dp" />
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/imageView"
-            android:layout_gravity="right" />
 
             <TextView
                 android:text="@string/rang"
