@@ -152,6 +152,8 @@ public class RegistrationActivity extends Activity
                             SharedPreferences.Editor editor = shPref.edit();
                             editor.putInt(Constants.userIDpref, id);
                             editor.putString(Constants.userNamepref, username);
+                            LogActivity.userID = id;
+                            LogActivity.userName = username;
                             editor.commit();
                             runOnUiThread(new Runnable() {
                                 @Override

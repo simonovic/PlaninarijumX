@@ -125,6 +125,7 @@ public class MyProfileActivity extends Activity
 
                         final Bitmap bMap = BitmapFactory.decodeByteArray(data, 0, data.length);
 
+                        in.close();
                         printWriter.close();
                         socket.close();
 
