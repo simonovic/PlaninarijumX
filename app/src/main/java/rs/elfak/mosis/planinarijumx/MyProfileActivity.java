@@ -49,6 +49,8 @@ public class MyProfileActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_profile);
 
+
+
         ime = (EditText)findViewById(R.id.ime);
         prezime = (EditText)findViewById(R.id.prezime);
         brTel = (EditText)findViewById(R.id.brtel);
@@ -92,6 +94,7 @@ public class MyProfileActivity extends Activity
                             Bundle extras = getIntent().getExtras();
                             String friendsID = extras.getString("friendsID");
                             request = "1\n" + friendsID + "\n";
+                            setTitle("Prijatelj");
                         }
                         else
                             request = "1\n" + LogActivity.userID + "\n";
