@@ -158,8 +158,7 @@ public class RegistrationActivity extends Activity
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Intent i = new Intent(RegistrationActivity.this, MainActivity.class);
-                                    startActivity(i);
+                                    finish();
                                 }
                             });
 

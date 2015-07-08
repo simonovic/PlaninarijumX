@@ -283,6 +283,8 @@ public class MainActivity extends Activity
 
     private void disconnect()
     {
+        LogActivity.userID = 0;
+        LogActivity.userName = "false";
         if(nitZaPitanja != null)
         {
 
@@ -342,7 +344,7 @@ public class MainActivity extends Activity
                // disconnect();
                 SharedPreferences.Editor editor = shPref.edit();
                 editor.putInt(Constants.userIDpref, 0);
-                editor.putString(Constants.userNamepref,"");
+                editor.putString(Constants.userNamepref,"false");
                 editor.commit();
                 finish();
                 break;

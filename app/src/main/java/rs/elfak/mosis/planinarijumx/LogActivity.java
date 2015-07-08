@@ -29,6 +29,12 @@ public class LogActivity extends Activity
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_log);
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
         shPref = getSharedPreferences(Constants.loginpref, Context.MODE_PRIVATE);
         userID = shPref.getInt(Constants.userIDpref, 0);
         userName = shPref.getString(Constants.userNamepref,"false");
