@@ -5,7 +5,5 @@
 
     <item android:id="@+id/action_dodaj_kviz_na_planini" android:title="@string/title_section4"
         android:orderInCategory="100" app:showAsAction="ifRoom" />
-    <item android:id="@+id/mapa" android:title="@string/action_mapa"
-        android:orderInCategory="100" app:showAsAction="ifRoom" />
 
 </menu>

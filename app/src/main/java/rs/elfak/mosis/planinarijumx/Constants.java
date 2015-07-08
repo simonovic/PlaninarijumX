@@ -8,12 +8,12 @@ public class Constants
     public static final String loginpref = "LoginPref";
     public static final String userIDpref = "userID";
     public static final String userNamepref = "userName";
-    //public static final String address = "192.168.1.10";
-    public static final String address = "aleksatr.ddns.net";
+    public static final String address = "10.10.67.130";
+   // public static final String address = "aleksatr.ddns.net";
     public static final int PORT = 4000;
     public static final int FRIENDPORT = 4001;
     public static final int perioda = 10000;
-    public static final int udaljenost = 500000;
+    public static final int udaljenost = 200000;
 
     public static double calcDistance(double lat1, double long1, double lat2, double long2)
     {

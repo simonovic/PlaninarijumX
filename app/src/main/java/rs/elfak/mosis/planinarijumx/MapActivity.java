@@ -199,6 +199,8 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                             title(getString(R.string.finish)));
 
                     marker.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_finishno));
+
+                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
                     resenaPitanja.put(marker, false);
                 }
             }
@@ -229,6 +231,8 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
                 {
                     Marker marker = map.addMarker(new MarkerOptions().position(latLng).
                             title("Cilj"));
+
+                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,16));
 
                     marker.setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_finishyes));
                     resenaPitanja.put(marker, true);
@@ -712,7 +716,8 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
 
                                         Place place = new Place(latLng.latitude, latLng.longitude, a, q, Place.ID++);
                                         quest.add(place);
-                                        map.addMarker(new MarkerOptions().position(latLng).title(q));
+                                        map.addMarker(new MarkerOptions().position(latLng).title(q))
+                                                .setIcon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_monyes));
                                     }
                                 })
                                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -817,6 +822,7 @@ public class MapActivity extends ActionBarActivity implements NavigationDrawerFr
 
     private void radiQuest()
     {
+        polyline.remove();
         Place pitanje = questSolver.getPitanje();
         if (pitanje == null)
             Toast.makeText(getApplicationContext(), "Cestitam, resio si.", Toast.LENGTH_SHORT)
